@@ -68,6 +68,24 @@ while True:
             else:
                 # If results is not empty, send card information to client
                 data = str(results[0]).encode()
+        if "LOGIN" in data.decode():
+            # If "LOGIN" is in the data, query for username and password
+            username = data.decode().split(" ")[1]
+            password = data.decode().split(" ")[2]
+            cur.execute("SELECT * FROM Users WHERE user_name = ? AND password = ?", (username, password))
+            # Fetch the results
+            results = cur.fetchall()
+            # Check if results is empty
+            if len(results) == 0:
+                # If results is empty, send error message to client
+                data = b"s: 401: Username or password is incorrect."
+            else:
+                # If results is not empty, send True to client
+                server_response = b"s: 200: Login successful.|"
+                # Grab the user data and send it back
+                user_data = str(results[0]).encode()
+                # Combine data and user_data so that they can be parsed easily and separated
+                data = f"{server_response}{user_data}".encode()
         conn.sendall(data) # Send data back to client
 
     # Close the connection
