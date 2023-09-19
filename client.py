@@ -39,8 +39,11 @@ while not QUIT:
     # BUY, SELL, LISTING ALL RECORDS IN POKEMON CARDS TABLE, BALANCE, SERVER SHUT DOWN, CLIENT SHUT DOWN
     if user_input == "1":
         print("c: BUY")
-        #   - Prompt user for card name and quantity
-        #   - Check if card exists in table
+        user_input = input("c: Enter card name: ")
+        #   - Prepend "QUERY" to user input
+        user_input = "QUERY " + user_input
+        #   - Query for card name to server
+        s.sendall(user_input.encode())
         #   - Check if quantity is available
         #   - Check if user has enough money
         #   - If all checks pass, update card count and user balance

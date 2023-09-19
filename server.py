@@ -52,6 +52,22 @@ while True:
     while True:
         data = conn.recv(MAX_LINE) # Receive data from client
         if not data: break # Break if no more data
+        # Print the received data and client address
+        print('s: Received', repr(data), 'from', addr)
+        # Check if "QUERY" is in the data
+        if "QUERY" in data.decode():
+            # If "QUERY" is in the data, query for card name
+            card_name = data.decode().split(" ")[1]
+            cur.execute("SELECT * FROM Pokemon_cards WHERE card_name = ?", (card_name,))
+            # Fetch the results
+            results = cur.fetchall()
+            # Check if results is empty
+            if len(results) == 0:
+                # If results is empty, send error message to client
+                data = b"s: Card does not exist."
+            else:
+                # If results is not empty, send card information to client
+                data = str(results[0]).encode()
         conn.sendall(data) # Send data back to client
 
     # Close the connection
