@@ -48,34 +48,25 @@ while True:
     conn, addr = s.accept() # Accept a connection
     print('s: Connected by', addr) # Print client address
 
-    # Receive data and send it back
     while True:
         data = conn.recv(MAX_LINE) # Receive data from client
         if not data: break # Break if no more data
-        # Print the received data and client address
-        print('s: Received', repr(data), 'from', addr)
-        # Check if "QUERY" is in the data
+
         if "QUERY" in data.decode():
-            # If "QUERY" is in the data, query for card name
+            print('s: Received', repr(data), 'from', addr)
             card_name = data.decode().split(" ")[1]
             cur.execute("SELECT * FROM Pokemon_cards WHERE card_name = ?", (card_name,))
-            # Fetch the results
             results = cur.fetchall()
-            # Check if results is empty
             if len(results) == 0:
-                # If results is empty, send error message to client
                 data = b"s: Card does not exist."
             else:
-                # If results is not empty, send card information to client
                 data = str(results[0]).encode()
         if "LOGIN" in data.decode():
-            # If "LOGIN" is in the data, query for username and password
+            print('s: Received', repr(data), 'from', addr)
             username = data.decode().split(" ")[1]
             password = data.decode().split(" ")[2]
             cur.execute("SELECT * FROM Users WHERE user_name = ? AND password = ?", (username, password))
-            # Fetch the results
             results = cur.fetchall()
-            # Check if results is empty
             if len(results) == 0:
                 # If results is empty, send error message to client
                 data = b"s: 401: Username or password is incorrect."
@@ -86,6 +77,40 @@ while True:
                 user_data = str(results[0]).encode()
                 # Combine data and user_data so that they can be parsed easily and separated
                 data = f"{server_response}{user_data}".encode()
+        if "BUY" in data.decode():
+            client_request = data.decode().replace("BUY ", "").split(" ")
+            print("s: RECEIVED {}".format(client_request))
+            card_name = data.decode().split(" ")[1]
+            cur.execute("SELECT * FROM Pokemon_cards WHERE card_name = ?", (card_name,))
+            # Fetch the results
+            results = cur.fetchall()
+            # Check if results is empty
+            if len(results) == 0:
+                # If results is empty, send error message to client
+                data = b"s: 403: Card does not exist."
+            else:
+                # Update card count and user balance
+                # If the person buys all the cards just set the owner_id to the user's ID
+                # Else if the person buys only some of the cards update the count of that card and create a new tuple with the remaining cards set to the purchasers ID
+                if int(client_request[3]) == int(results[0][4]):
+                    cur.execute("UPDATE Pokemon_cards SET owner_id = ? WHERE card_name = ?", (int(client_request[5]), card_name))
+                else:
+                    cur.execute("UPDATE Pokemon_cards SET count = ? WHERE card_name = ?", (int(results[0][4]) - int(client_request[3]), card_name))
+                    cur.execute("INSERT INTO Pokemon_cards(card_name, card_type, rarity, count, owner_id) VALUES (?, ?, ?, ?, ?)", (card_name, results[0][2], results[0][3], int(results[0][4])-int(client_request[3]), int(client_request[5])))
+                # Grab user balance based on ID which is client_request[5]
+                cur.execute("SELECT * FROM Users WHERE ID = ?", (int(client_request[5]),))
+                # Fetch the results
+                balance = cur.fetchall()
+                balance = float(balance[0][5])
+                cur.execute("UPDATE Users SET usd_balance = ? WHERE ID = ?", (float(balance) - int(client_request[3])*float(client_request[2]), int(client_request[5])))
+                # Commit changes
+                con.commit()
+                # Grab new balance 
+                cur.execute("SELECT * FROM Users WHERE ID = ?", (int(client_request[5]),))
+                # Fetch the results
+                balance = cur.fetchall()
+                # Send success message to client
+                data = f"200 OK|{balance[0][5]}".encode()
         conn.sendall(data) # Send data back to client
 
     # Close the connection
