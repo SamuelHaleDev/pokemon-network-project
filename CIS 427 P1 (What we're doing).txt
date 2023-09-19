@@ -1,0 +1,4 @@
+CIS 427
+Sam - Buy and List 
+Andrew - Sale and Balance
+EDward - Shutdown and Quit 
