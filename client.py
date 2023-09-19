@@ -44,7 +44,24 @@ while not QUIT:
         user_input = "QUERY " + user_input
         #   - Query for card name to server
         s.sendall(user_input.encode())
+        #  - Receive card information from server
+        data = s.recv(MAX_LINE)
+        #  - Print card information
+        print(data.decode())
+        #   - data.decode() = "('Pikachu', 'Electric', 'Common', 2, 1)"
+        #   - Query for desired quantity
+        user_input = input("c: Enter quantity: ")
         #   - Check if quantity is available
+        #   - parse data and initialize a list with the values
+        data = data.decode()
+        data = data.replace("(", "")
+        data = data.replace(")", "")
+        data = data.replace("'", "")
+        data = data.split(", ")
+        if (int(user_input) > int(data[3])):
+            print("c: Insufficient quantity.")
+        
+            
         #   - Check if user has enough money
         #   - If all checks pass, update card count and user balance
         #   - If any check fails, print error message
