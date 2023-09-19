@@ -46,7 +46,7 @@ s.listen(MAX_PENDING) # Listen for connection
 # Wait for connection
 while True:
     conn, addr = s.accept() # Accept a connection
-    print('Connected by', addr) # Print client address
+    print('s: Connected by', addr) # Print client address
 
     # Receive data and send it back
     while True:
