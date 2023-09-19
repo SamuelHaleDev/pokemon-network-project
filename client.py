@@ -87,8 +87,8 @@ def Buy():
         if b"200" in data:
             balance = data.split(b"|")[1]
             print("c: Bought: {} {} New Balance: {}".format(quantity, pokemon[1], float(balance)))
-        #  - ELSE TRANSACTION FAILED
         else:
+            #  - ELSE TRANSACTION FAILED
             print("c: Transaction failed. Server Message: {}".format(data.decode()))
     
 while not QUIT:
@@ -96,9 +96,6 @@ while not QUIT:
         user_input = menu()
         if (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6"):
             print("c: Invalid input. Please enter a number between 1 and 6.")
-        
-    # Write a menu that provides the following options:
-    # BUY, SELL, LISTING ALL RECORDS IN POKEMON CARDS TABLE, BALANCE, SERVER SHUT DOWN, CLIENT SHUT DOWN
     if user_input == "1":
         Buy()
     if user_input == "2":
