@@ -55,6 +55,42 @@ def menu():
 # Log on
 user = login()
 
+def Buy():
+    #  - GET CARD DATA
+    user_input = input("c: Enter card name: ")
+    user_input = "QUERY " + user_input
+    s.sendall(user_input.encode())
+    data = s.recv(MAX_LINE)
+    print(data.decode())
+    pokemon = data.decode().replace("(", "").replace(")", "").replace("'", "").split(", ")
+    
+    #  - PROMPT USER FOR DESIRED QUANTITY AND PRICE
+    quantity = input("c: Enter quantity: ")
+    price = input("c: Enter price: ")
+    
+    #  - CHECK IF ENOUGH CARDS EXIST
+    if (int(quantity) > int(pokemon[4])):
+        print("c: Insufficient quantity.")
+    #  - CHECK IF USER HAS ENOUGH FUNDS
+    elif (float(user[5]) < float(price)*int(quantity)):
+        print("c: Insufficient funds.")
+    #  - CHECK IF USER ALREADY OWNS CARD
+    elif (int(user[0]) == int(pokemon[len(pokemon)-1])):
+        print("c: You already own this card.")
+    else:
+        #  - SEND REQUEST TO SERVER
+        client_request = "BUY {} {} {} {} {} {}".format(pokemon[1], pokemon[2], price, quantity, pokemon[5], user[0])
+        s.sendall(client_request.encode())
+        data = s.recv(MAX_LINE)
+        
+        #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
+        if b"200" in data:
+            balance = data.split(b"|")[1]
+            print("c: Bought: {} {} New Balance: {}".format(quantity, pokemon[1], float(balance)))
+        #  - ELSE TRANSACTION FAILED
+        else:
+            print("c: Transaction failed. Server Message: {}".format(data.decode()))
+    
 while not QUIT:
     while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6":
         user_input = menu()
@@ -64,33 +100,7 @@ while not QUIT:
     # Write a menu that provides the following options:
     # BUY, SELL, LISTING ALL RECORDS IN POKEMON CARDS TABLE, BALANCE, SERVER SHUT DOWN, CLIENT SHUT DOWN
     if user_input == "1":
-        print("c: BUY")
-        user_input = input("c: Enter card name: ")
-        #   - Prepend "QUERY" to user input
-        user_input = "QUERY " + user_input
-        #   - Query for card name to server
-        s.sendall(user_input.encode())
-        #  - Receive card information from server
-        data = s.recv(MAX_LINE)
-        #  - Print card information
-        print(data.decode())
-        #   - data.decode() = "('Pikachu', 'Electric', 'Common', 2, 1)"
-        #   - Query for desired quantity
-        quantity = input("c: Enter quantity: ")
-        price = input("c: Enter price: ")
-        #   - Check if quantity is available
-        #   - parse data and initialize a list with the values
-        pokemon = data.decode().replace("(", "").replace(")", "").replace("'", "").split(", ")
-        if (int(quantity) > int(pokemon[3])):
-            print("c: Insufficient quantity.")
-        #   - Check if user has enough money
-        if (float(user[4]) < float(pokemon[4])*int(quantity)):
-            print("c: Insufficient funds.")
-        #   - If all checks pass, update card count and user balance
-        # c: BUY Pikachu Electric Common 19.99 2 1 sample server request BUY | pokemon[0] | pokemon[1] | pokemon[2] | price | quantity | user[0]
-        server_request = "BUY {} {} {} {} {} {}".format(pokemon[0], pokemon[1], pokemon[2], price, quantity, user[0])
-        s.sendall(server_request.encode())
-        #   - If any check fails, print error message
+        Buy()
     if user_input == "2":
         print("c: SELL")
         #   - Prompt user for card name and quantity
@@ -112,15 +122,8 @@ while not QUIT:
         #   - Close connection
         #   - Set QUIT to True
         #   - Break out of while loop
-
-# Send data
-s.sendall(b'Hello, world') # Send data to server
-
-# Receive data
-data = s.recv(MAX_LINE) # Receive data from server
+    
 
 # Close the connection
 s.close()
 
-# Print received data
-print('Received', repr(data)) # Print received data
