@@ -2,7 +2,7 @@ import socket
 
 # Define server address and port
 SERVER_HOST = 'localhost'
-SERVER_PORT = 4895
+SERVER_PORT = 4896
 QUIT = False
 user_input = ""
 
@@ -106,8 +106,16 @@ while not QUIT:
         #   - If all checks pass, update card count and user balance
         #   - If any check fails, print error message
     if user_input == "3":
+        #  - BUILD CLIENT REQUEST
         print("c: LISTING ALL RECORDS IN POKEMON CARDS TABLE")
-        #   - Print all records in Pokemon_cards table
+        client_request = "LIST"
+        owner_id = input("c: Enter owner ID: ")
+        client_request = client_request + " " + owner_id
+        
+        #  - SEND AND RECEIVE DATA
+        s.sendall(client_request.encode())
+        data = s.recv(MAX_LINE)
+        print(data.decode())
     if user_input == "4":
         print("c: BALANCE")
         #   - Print user's balance
@@ -119,6 +127,7 @@ while not QUIT:
         #   - Close connection
         #   - Set QUIT to True
         #   - Break out of while loop
+    user_input = ""
     
 
 # Close the connection

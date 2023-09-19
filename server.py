@@ -12,7 +12,7 @@ cur.execute("CREATE TABLE IF NOT EXISTS Pokemon_cards(ID INTEGER PRIMARY KEY AUT
 con.commit()
 
 # Define server port
-PORT = 4895 # Port number is a 16-bit unsigned integer
+PORT = 4896 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
 
@@ -96,6 +96,15 @@ while True:
                 
                 #  - SEND SUCCESS MESSAGE WITH NEW BALANCE
                 data = f"200 OK|{balance[0][5]}".encode()
+        if "LIST" in data.decode():
+            #  - GRAB OWNER ID FROM CLIENT REQUEST
+            owner_id = data.decode().split(" ")[1]
+            #  - GRAB ALL CARD DATA WHERE OWNER ID = OWNER ID
+            cur.execute("SELECT * FROM Pokemon_cards WHERE owner_id = ?", (owner_id,))
+            results = cur.fetchall()
+            
+            #  - SEND CARD DATA
+            data = str(results).encode()
         conn.sendall(data) # Send data back to client
 
     # Close the connection
