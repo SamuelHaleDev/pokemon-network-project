@@ -2,3 +2,59 @@ CIS 427
 Sam - Buy and List 
 Andrew - Sale and Balance
 EDward - Shutdown and Quit 
+
+Buy Functionality Testing
+We need to test a few things
+1 - We need to test buying a card that doesn't exist
+2 - We need to test buying a card at a price that exceeds our wallet
+3 - We need to test buying a card we already have
+4 - We need to test buying more cards than exist
+5 - We need to test buying only partial card stock (i.e. if 2 cards exist buy only 1)
+6 - We need to test buying all of card stock (i.e. if 2 cards exist buy 2)
+
+On each test where a database modification is done make sure to query for all of the table data and print it to
+verify the results are as expected
+
+How to run the server and client so we can test
+1 - Need Python installed and need to make sure your PATH variables include the path to python 
+This video can be referred to for installation: https://www.youtube.com/watch?v=bCY4D9n3Pew&ab_channel=ProgrammingKnowledge
+A restart may be required
+2 - After installing verify it is correctly installed by opening cmd and running "python --version" 
+if it is installed and properly set in your PATH variable it will respond with a version
+otherwise it will say "command unrecognized"
+3 - Open root project folder in vs code
+4 - After that in VS Code select "Terminal" from the top utility bar and select "New Terminal" 
+5 - Open 2 terminals
+5 - In one terminal make sure you are in root project folder (i.e. you should have client.py and server.py listed
+if you type "pwd" command)
+6 - Once you verify you are in root project directory type "python server.py" in one terminal 
+7 - In the other type "python client.py"
+
+DEBUGGING
+If you want to debug you can only debug the server or the client at a time you cannot do both at once.
+Server - 
+1 - When you are in your server.py select "Run" from the top utility bar. 
+2 - Select "Run & Debug"
+3 - Open a new terminal
+4 - Making sure you are in root project directory run "python client.py"
+
+Client -
+1 - Open a new terminal
+2 - Making sure you are in root project directory run "python server.py"
+3 - Select client.py file in vs code file explorer or from your file tab 
+4 - Select "Run" from the top utility bar
+5 - Select "Run & Debug"
+
+How to stop your client or server when running it from terminal 
+1 - Select the terminal where your server or client is running 
+2 - Click inside of the terminal 
+3 - Press Ctrl + "C"
+If done correctly you should get some sort of output that indicates that your client or server is closed
+
+Some potential hiccups 
+When you select "Run & Debug" you might be asked to select a debugger. Just select python option and it should be
+straight forward from there
+
+If you close your server and client and try to run them sometimes you will get the error that "Address/ Port is already binded"
+This indicates that the Port/ Address is already in use. To fix stop client and server from running and change 
+the PORT variable in both client.py and server.py. Save both files and retry.
