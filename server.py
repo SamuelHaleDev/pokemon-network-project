@@ -9,28 +9,6 @@ cur = con.cursor() # Create cursor object
 cur.execute("CREATE TABLE IF NOT EXISTS Users(ID INTEGER PRIMARY KEY AUTOINCREMENT, first_name Text, last_name Text, user_name Text NOT NULL, password Text, usd_balance DOUBLE NOT NULL)")
 cur.execute("CREATE TABLE IF NOT EXISTS Pokemon_cards(ID INTEGER PRIMARY KEY AUTOINCREMENT, card_name TEXT NOT NULL, card_type TEXT NOT NULL, rarity TEXT NOT NULL, count INTEGER, owner_id INTEGER, FOREIGN KEY (owner_id) REFERENCES Users(ID))")
 
-# Insert data into tables
-user_data = [ 
-    ("John", "Doe", "j_doe", "Passwrd4", 80),
-    ("Jane", "Smith", "j_smith", "Pass456", 10),
-    ("charlie", "brown", "c_brown", "Snoopy", 90),
-    ("lucy", "van", "l_van", "Football", 70),
-    ("linus", "blanket", "l_blanket", "security23", 90),
-    ]
-
-card_data = [ 
-    ("Pikachu", "Electric", "Common", 2, 1),
-    ("Charizard", "Fire", "Rare", 1, 1),
-    ("Balbasaur", "Grass", "Common", 50, 3),
-    ("Squirtle", "Water", "Uncommon", 30, 4),
-    ("Jigglypuff", "Normal", "Common", 3, 5),
-    ]
-
-
-cur.executemany("INSERT OR IGNORE INTO Users(first_name, last_name, user_name, password, usd_balance) VALUES (?, ?, ?, ?, ?)", user_data)
-con.commit()
-
-cur.executemany("INSERT OR IGNORE INTO Pokemon_cards(card_name, card_type, rarity, count, owner_id) VALUES (?, ?, ?, ?, ?)", card_data)
 con.commit()
 
 # Define server port
