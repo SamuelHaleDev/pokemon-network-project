@@ -9,6 +9,8 @@ MAX_LINE = 256 # Maximum number of bytes to receive
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a TCP socket
 s.bind(('', PORT)) # Bind the socket to the port
 s.listen(MAX_PENDING) # Listen for connection
+# Print to notify user that server is ready
+print('Server listening on port', PORT)
 
 # Wait for connection
 while True:
