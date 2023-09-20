@@ -73,11 +73,6 @@ while True:
             if len(results) == 0:
                 data = b"s: Error 403: Card does not exist."
             else:
-                print("s: BEFORE")
-                cur.execute("SELECT * FROM Pokemon_cards")
-                print("s: " + str(cur.fetchall()))
-                cur.execute("SELECT * FROM Users")
-                print("s: " + str(cur.fetchall()))
                 #  - CHECK IF USER IS BUYING ALL CARDS. IF SO, UPDATE OWNER_ID. 
                 if int(client_request[3]) == int(results[0][4]):
                     cur.execute("UPDATE Pokemon_cards SET owner_id = ? WHERE card_name = ?", (int(client_request[5]), card_name))
@@ -94,12 +89,6 @@ while True:
                 cur.execute("UPDATE Users SET usd_balance = ? WHERE ID = ?", (
                     float(balance) - int(client_request[3])*float(client_request[2]), int(client_request[5])))
                 con.commit()
-                #  - PRINT ALL DATABASE TABLES
-                print("s: AFTER")
-                cur.execute("SELECT * FROM Pokemon_cards")
-                print("s: " + str(cur.fetchall()))
-                cur.execute("SELECT * FROM Users")
-                print("s: " + str(cur.fetchall()))
                 
                 #  - GRAB NEW BALANCE
                 cur.execute("SELECT * FROM Users WHERE ID = ?", (int(client_request[5]),))
@@ -120,6 +109,11 @@ while True:
 
     # Close the connection
     conn.close()
+    
+    # cur.execute("SELECT * FROM Pokemon_cards")
+    # print(cur.fetchall())
+    # cur.execute("SELECT * FROM Users")
+    # print(cur.fetchall())
     
     
 
