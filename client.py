@@ -67,32 +67,41 @@ def Buy():
         return
     pokemon = data.decode().replace("(", "").replace(")", "").replace("'", "").split(", ")
     
-    #  - PROMPT USER FOR DESIRED QUANTITY AND PRICE
+    #  - PROMPT USER FOR DESIRED QUANTITY 
     quantity = input("c: Enter quantity: ")
-    price = input("c: Enter price: ")
-    
-    #  - CHECK IF ENOUGH CARDS EXIST
+    #  - CHECK IF QUANTITY IS VALID
+    if (int(quantity) < 0):
+        print("c: Invalid quantity. Please enter a number greater than 0.")
+        return
     if (int(quantity) > int(pokemon[4])):
-        print("c: Insufficient quantity.")
+        print("c: Not enough stock.")
+        return
+    
+    #  - PROMPT USER FOR PRICE   
+    price = input("c: Enter price: ")
+    if (float(price) < 0):
+        print("c: Invalid price. Please enter a number greater than 0.")
+        return
     #  - CHECK IF USER HAS ENOUGH FUNDS
-    elif (float(user[5]) < float(price)*int(quantity)):
-        print("c: Insufficient funds.")
+    if (float(user[5]) < float(price)*int(quantity)):
+        print("c: Insufficient funds. Please enter a lower price.")
+        return
     #  - CHECK IF USER ALREADY OWNS CARD
-    elif (int(user[0]) == int(pokemon[len(pokemon)-1])):
+    if (int(user[0]) == int(pokemon[len(pokemon)-1])):
         print("c: You already own this card.")
+        return
+    #  - SEND REQUEST TO SERVER
+    client_request = "BUY {} {} {} {} {} {}".format(pokemon[1], pokemon[2], price, quantity, pokemon[5], user[0])
+    s.sendall(client_request.encode())
+    data = s.recv(MAX_LINE)
+    
+    #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
+    if b"200" in data:
+        balance = data.split(b"|")[1]
+        print("c: Bought: {} {} New Balance: {}".format(quantity, pokemon[1], float(balance)))
     else:
-        #  - SEND REQUEST TO SERVER
-        client_request = "BUY {} {} {} {} {} {}".format(pokemon[1], pokemon[2], price, quantity, pokemon[5], user[0])
-        s.sendall(client_request.encode())
-        data = s.recv(MAX_LINE)
-        
-        #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
-        if b"200" in data:
-            balance = data.split(b"|")[1]
-            print("c: Bought: {} {} New Balance: {}".format(quantity, pokemon[1], float(balance)))
-        else:
-            #  - ELSE TRANSACTION FAILED
-            print("c: Transaction failed. Server Message: {}".format(data.decode()))
+        #  - ELSE TRANSACTION FAILED
+        print("c: Transaction failed. Server Message: {}".format(data.decode()))
     
 while not QUIT:
     while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6":
