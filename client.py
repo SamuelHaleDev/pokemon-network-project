@@ -61,7 +61,10 @@ def Buy():
     user_input = "QUERY " + user_input
     s.sendall(user_input.encode())
     data = s.recv(MAX_LINE)
-    print(data.decode())
+    if b"Error" in data:
+        print(data.decode())
+        print("c: Card {}".format(user_input.split(" ")[1]))
+        return
     pokemon = data.decode().replace("(", "").replace(")", "").replace("'", "").split(", ")
     
     #  - PROMPT USER FOR DESIRED QUANTITY AND PRICE

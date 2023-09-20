@@ -40,7 +40,7 @@ while True:
             
             #  - SEND CARD DATA OR ERROR MESSAGE
             if len(results) == 0:
-                data = b"s: Card does not exist."
+                data = b"s: Error 403: Card does not exist."
             else:
                 data = str(results[0]).encode()
         if "LOGIN" in data.decode():
@@ -53,7 +53,7 @@ while True:
             cur.execute("SELECT * FROM Users WHERE user_name = ? AND password = ?", (username, password))
             results = cur.fetchall()
             if len(results) == 0:
-                data = b"s: 401: Username or password is incorrect."
+                data = b"s: Error 401: Username or password is incorrect."
             else:
                 #  - SEND USER DATA
                 server_response = b"s: 200: Login successful.|"
@@ -71,7 +71,7 @@ while True:
             
             #  - CHECK IF CARD EXISTS. IF NOT, SEND ERROR MESSAGE
             if len(results) == 0:
-                data = b"s: 403: Card does not exist."
+                data = b"s: Error 403: Card does not exist."
             else:
                 #  - CHECK IF USER IS BUYING ALL CARDS. IF SO, UPDATE OWNER_ID. 
                 if int(client_request[3]) == int(results[0][4]):
