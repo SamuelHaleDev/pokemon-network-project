@@ -1,0 +1,25 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-client",
+      "appliesTo": "client.py",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-pokemon-network-project",
+      "appliesTo": "/",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-server",
+      "appliesTo": "server.py",
+      "type": "launch"
+    },
+    {
+      "taskLabel": "task-pokemon-network-project",
+      "appliesTo": "/",
+      "type": "launch"
+    }
+  ]
+}

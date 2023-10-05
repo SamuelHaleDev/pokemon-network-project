@@ -1,4 +1,5 @@
 import socket
+from typing import List
 
 # Define server address and port
 SERVER_HOST = 'localhost'
@@ -14,8 +15,8 @@ s.connect((SERVER_HOST, SERVER_PORT)) # Connect to server address
 
 def login():
     # Prompt user for username and password
-    username = input("c: Enter username: ")
-    password = input("c: Enter password: ")
+    username = "j_doe"#input("c: Enter username: ")
+    password = "Passwrd4"#input("c: Enter password: ")
     # Send "LOGIN" + username + password to server
     s.sendall(("LOGIN " + username + " " + password).encode())
     # Receive response from server
@@ -103,6 +104,88 @@ def Buy():
         #  - ELSE TRANSACTION FAILED
         print("c: Transaction failed. Server Message: {}".format(data.decode()))
     
+
+def SELL():
+    pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:")
+    while pokemon == "":
+        pokemon = input("Please enter a Pokemon to sell: ")
+
+    userID = input("Please input your userID: ")
+    while userID == "" or not userID.isdigit():
+        userID = input("Please input your userID: ")
+
+    data = "INVENTORY " + pokemon + " " + userID
+    s.sendall(data.encode())
+    data = str(s.recv(MAX_LINE))
+    ir, data, data2 = data.split("'")
+    count = ""
+
+    #quantity = data.split("'")
+    #print(data)
+    #print(count)
+    while (data == "NOTFOUND") and not (pokemon == "CANCEL"):
+        print("Pokemon Not Found")
+        pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:") 
+        #pokemon = "QUERYSELL " + pokemon + " " + userID
+        data = "INVENTORY " + pokemon + " " + userID
+        s.sendall(data.encode())
+        data = str(s.recv(MAX_LINE))
+        ir, data, data2 = data.split("'")
+
+
+    for c in data2: 
+            if c.isdigit(): 
+                count = count + c
+
+    #print(f"You are trying to sell {data}")
+
+    #print(count)
+
+    if pokemon == "CANCEL":
+        return;
+
+    quantity = input("Please enter the quantity you want to sell: ")
+    while quantity == "":
+        quantity = input("Please enter a quantity to sell: ")
+
+    #print(trueCount)
+
+    while (int(count) < int(quantity)):
+        quantity = input("You do not own that many, how many would you like to sell? ")
+
+    price = input("Please enter the price you want to sell for:")
+    while (price == "") or (float(price) < 0):
+        price = input("Please enter a price to sell(Price must be greater then $0): ")
+
+
+    data = "SELL " + data + " " + quantity + " " + price + " " + userID
+    s.sendall(data.encode())    
+    #print(f"SELL {pokemon} {quantity} {price} {ID}")
+
+
+    #cur.execute(f"UPDATE Pokemon_cards SET count = (count - {quantity}) WHERE owner_id = {user_ID} AND card_name = '{pokemon}'")
+    #cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{quantity})) WHERE ID = {user_ID}")
+    #print(f"Confirming the sale of\tPokemon: {pokemon}\tQuantity: {quantity}\tPrice: {price}")
+
+
+def BALANCE():
+    #User Checks their balance
+    userID = input("Please input your userID: ")
+    while userID == "" or not userID.isdigit():
+        userID = input("Please input your userID: ")
+    data = "BALANCE " + userID
+    s.sendall(data.encode())
+    data = str(s.recv(MAX_LINE))
+    data = data.split("'")[1]
+    balance = ""
+    for c in data: 
+            if c.isdigit() or (c == '.'): 
+                balance = balance + c
+
+    print(balance)
+
+
+
 while not QUIT:
     while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6":
         user_input = menu()
@@ -111,7 +194,8 @@ while not QUIT:
     if user_input == "1":
         Buy()
     if user_input == "2":
-        print("c: SELL")
+        #print("c: SELL")
+        SELL()
         #   - Prompt user for card name and quantity
         #   - Check if card exists in table
         #   - Check if user has enough cards
@@ -129,7 +213,7 @@ while not QUIT:
         data = s.recv(MAX_LINE)
         print(data.decode())
     if user_input == "4":
-        print("c: BALANCE")
+        BALANCE()
         #   - Print user's balance
     if user_input == "5":
         print("c: SERVER SHUT DOWN")

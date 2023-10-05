@@ -29,7 +29,6 @@ while True:
     while True:
         data = conn.recv(MAX_LINE) # Receive data from client
         if not data: break # Break if no more data
-
         if "QUERY" in data.decode():
             print('s: Received', repr(data), 'from', addr)
             
@@ -96,6 +95,37 @@ while True:
                 
                 #  - SEND SUCCESS MESSAGE WITH NEW BALANCE
                 data = f"200 OK|{balance[0][5]}".encode()
+        if "INVENTORY"in data.decode():
+            print('s: Received', repr(data), 'from', addr)
+            
+            #  - GET CARD DATA
+            card_name = data.decode().split(" ")[1]
+            userID = int(data.decode().split(" ")[2])
+            pokemon = cur.execute(f"SELECT card_name, count FROM Pokemon_cards WHERE owner_id = {userID} AND card_name = '{card_name}'").fetchall()
+            # - GRAB A CARD AT A SPECIFIC USER 
+            if (pokemon == []):
+                data = b"NOTFOUND"
+            else:
+                data = str(pokemon).encode()
+        if "SELL" in data.decode():
+            print('s: Received', repr(data), 'from', addr)
+            # - GET THE DATA FOR SELL
+            #data = "SELL " + pokemon + " " + quantity + " " + price + " " + userID
+            pokemon = data.decode().split(" ")[1]
+            quantity = data.decode().split(" ")[2]
+            price = data.decode().split(" ")[3]
+            userID = data.decode().split(" ")[4]
+            print(pokemon + " " + quantity + " " + price + " " + userID)
+            cur.execute(f"UPDATE Pokemon_cards SET count = (count - {quantity}) WHERE owner_id = {userID} AND card_name = '{pokemon}'")
+            cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{quantity})) WHERE ID = {userID}")
+        if "BALANCE" in data.decode():
+            #  - GRAB OWNER ID FROM CLIENT REQUEST
+            owner_id = data.decode().split(" ")[1]
+            # - GRAB THE BALANCE OF THE USER
+            cur.execute(f"SELECT usd_balance FROM Users WHERE ID = {owner_id}")
+            balance = cur.fetchall()
+            data = str(balance).encode()
+
         if "LIST" in data.decode():
             #  - GRAB OWNER ID FROM CLIENT REQUEST
             owner_id = data.decode().split(" ")[1]
@@ -114,9 +144,4 @@ while True:
     # print(cur.fetchall())
     # cur.execute("SELECT * FROM Users")
     # print(cur.fetchall())
-    
-    
-
-
-
     
