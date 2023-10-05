@@ -15,8 +15,8 @@ s.connect((SERVER_HOST, SERVER_PORT)) # Connect to server address
 
 def login():
     # Prompt user for username and password
-    username = "j_doe"#input("c: Enter username: ")
-    password = "Passwrd4"#input("c: Enter password: ")
+    username = input("c: Enter username: ")
+    password = input("c: Enter password: ")
     # Send "LOGIN" + username + password to server
     s.sendall(("LOGIN " + username + " " + password).encode())
     # Receive response from server
