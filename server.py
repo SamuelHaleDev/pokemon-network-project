@@ -29,23 +29,20 @@ while True:
     while True:
         data = conn.recv(MAX_LINE) # Receive data from client
         if not data: break # Break if no more data
-<<<<<<< Updated upstream
-=======
+        
+        if data.decode().strip() == "SHUTDOWN": # Check if received data is the SHUTDOWN command
+            print('s: Received:', data.decode().strip())  # Print server's message of SHUTDOWN command
+            conn.sendall(b"200 OK\n") # Send acknowledgment (200 OK) to client
+            conn.close() # Close current client connection
+            s.close() # Close server socket
+            con.close() # Close database connection
+            exit() # Terminate server
 
-        if data.decode().strip() == "SHUTDOWN":
-            print('s: Received:', data.decode().strip())
-            conn.sendall(b"200 OK\n")
-            conn.close()
-            s.close()
-            con.close() # Close the database connection
-            exit() # Terminate the server
-
-        if "QUIT" in data.decode():
-            print('s: Received QUIT command from', addr)
+        if "QUIT" in data.decode(): # Check if the received data contains the QUIT command
+            print('s: Received QUIT command from', addr) # Print on server that QUIT command was received and from which client address
             #   - Send confirmation message back to client
             data = b"200 OK"
 
->>>>>>> Stashed changes
         if "QUERY" in data.decode():
             print('s: Received', repr(data), 'from', addr)
             
@@ -56,7 +53,7 @@ while True:
             
             #  - SEND CARD DATA OR ERROR MESSAGE
             if len(results) == 0:
-                data = b"s: Error 403: Card does not exist."
+                data = b"s: Card does not exist."
             else:
                 data = str(results[0]).encode()
         if "LOGIN" in data.decode():
@@ -69,7 +66,7 @@ while True:
             cur.execute("SELECT * FROM Users WHERE user_name = ? AND password = ?", (username, password))
             results = cur.fetchall()
             if len(results) == 0:
-                data = b"s: Error 401: Username or password is incorrect."
+                data = b"s: 401: Username or password is incorrect."
             else:
                 #  - SEND USER DATA
                 server_response = b"s: 200: Login successful.|"
@@ -87,7 +84,7 @@ while True:
             
             #  - CHECK IF CARD EXISTS. IF NOT, SEND ERROR MESSAGE
             if len(results) == 0:
-                data = b"s: Error 403: Card does not exist."
+                data = b"s: 403: Card does not exist."
             else:
                 #  - CHECK IF USER IS BUYING ALL CARDS. IF SO, UPDATE OWNER_ID. 
                 if int(client_request[3]) == int(results[0][4]):
@@ -97,7 +94,7 @@ while True:
                     cur.execute("UPDATE Pokemon_cards SET count = ? WHERE card_name = ?"
                                 , (int(results[0][4]) - int(client_request[3]), card_name))
                     cur.execute("INSERT INTO Pokemon_cards(card_name, card_type, rarity, count, owner_id) VALUES (?, ?, ?, ?, ?)"
-                                , (card_name, results[0][2], results[0][3], int(client_request[3]), int(client_request[5])))
+                                , (card_name, results[0][2], results[0][3], int(results[0][4])-int(client_request[3]), int(client_request[5])))
                 #  - GRAB AND UPDATE USER BALANCE
                 cur.execute("SELECT * FROM Users WHERE ID = ?", (int(client_request[5]),))
                 balance = cur.fetchall()
@@ -112,37 +109,6 @@ while True:
                 
                 #  - SEND SUCCESS MESSAGE WITH NEW BALANCE
                 data = f"200 OK|{balance[0][5]}".encode()
-        if "INVENTORY"in data.decode():
-            print('s: Received', repr(data), 'from', addr)
-            
-            #  - GET CARD DATA
-            card_name = data.decode().split(" ")[1]
-            userID = int(data.decode().split(" ")[2])
-            pokemon = cur.execute(f"SELECT card_name, count FROM Pokemon_cards WHERE owner_id = {userID} AND card_name = '{card_name}'").fetchall()
-            # - GRAB A CARD AT A SPECIFIC USER 
-            if (pokemon == []):
-                data = b"NOTFOUND"
-            else:
-                data = str(pokemon).encode()
-        if "SELL" in data.decode():
-            print('s: Received', repr(data), 'from', addr)
-            # - GET THE DATA FOR SELL
-            #data = "SELL " + pokemon + " " + quantity + " " + price + " " + userID
-            pokemon = data.decode().split(" ")[1]
-            quantity = data.decode().split(" ")[2]
-            price = data.decode().split(" ")[3]
-            userID = data.decode().split(" ")[4]
-            print(pokemon + " " + quantity + " " + price + " " + userID)
-            cur.execute(f"UPDATE Pokemon_cards SET count = (count - {quantity}) WHERE owner_id = {userID} AND card_name = '{pokemon}'")
-            cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{quantity})) WHERE ID = {userID}")
-        if "BALANCE" in data.decode():
-            #  - GRAB OWNER ID FROM CLIENT REQUEST
-            owner_id = data.decode().split(" ")[1]
-            # - GRAB THE BALANCE OF THE USER
-            cur.execute(f"SELECT usd_balance FROM Users WHERE ID = {owner_id}")
-            balance = cur.fetchall()
-            data = str(balance).encode()
-
         if "LIST" in data.decode():
             #  - GRAB OWNER ID FROM CLIENT REQUEST
             owner_id = data.decode().split(" ")[1]
@@ -157,8 +123,8 @@ while True:
     # Close the connection
     conn.close()
     
-    # cur.execute("SELECT * FROM Pokemon_cards")
-    # print(cur.fetchall())
-    # cur.execute("SELECT * FROM Users")
-    # print(cur.fetchall())
+    
+
+
+
     
