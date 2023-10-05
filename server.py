@@ -29,6 +29,23 @@ while True:
     while True:
         data = conn.recv(MAX_LINE) # Receive data from client
         if not data: break # Break if no more data
+<<<<<<< Updated upstream
+=======
+
+        if data.decode().strip() == "SHUTDOWN":
+            print('s: Received:', data.decode().strip())
+            conn.sendall(b"200 OK\n")
+            conn.close()
+            s.close()
+            con.close() # Close the database connection
+            exit() # Terminate the server
+
+        if "QUIT" in data.decode():
+            print('s: Received QUIT command from', addr)
+            #   - Send confirmation message back to client
+            data = b"200 OK"
+
+>>>>>>> Stashed changes
         if "QUERY" in data.decode():
             print('s: Received', repr(data), 'from', addr)
             

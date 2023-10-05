@@ -218,8 +218,17 @@ while not QUIT:
     if user_input == "5":
         print("c: SERVER SHUT DOWN")
         #   - Send message to server to shut down
+        s.sendall(b"SHUTDOWN\n")
+        data = s.recv(MAX_LINE)
+        print("c:", data.decode().strip())
     if user_input == "6":
         print("c: CLIENT SHUT DOWN")
+        #   - Send QUIT message to server
+        s.sendall("QUIT".encode())
+        #   - Wait for confirmation message from server
+        data = s.recv(MAX_LINE)
+        if b"200 OK" in data:
+            QUIT = True
         #   - Close connection
         #   - Set QUIT to True
         #   - Break out of while loop
