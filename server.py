@@ -166,6 +166,10 @@ while True:
             results = cur.fetchall()
             #  - SEND CARD DATA
             data = str(results).encode()
+        if "STATUS" in data.decode():
+            #  - SEND BACK "SERVER_RUNNING"
+            data = b"SERVER_RUNNING"
+            data = str(data).encode()
         conn.sendall(data) # Send data back to client
 
     # Close the connection

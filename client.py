@@ -2,7 +2,19 @@ import socket
 from typing import List
 
 # Define server address and port
-SERVER_HOST = 'localhost'
+import argparse
+
+# Create an argument parser
+parser = argparse.ArgumentParser(description='Client for Pokemon Network Project')
+
+# Add an argument for the server host
+parser.add_argument('server_host', type=str, help='The hostname or IP address of the server')
+
+# Parse the command line arguments
+args = parser.parse_args()
+
+# Use the server host from the command line arguments
+SERVER_HOST = args.server_host
 SERVER_PORT = 4896
 QUIT = False
 user_input = ""
@@ -160,6 +172,9 @@ def SELL():
     while (int(count) < int(quantity)):
         quantity = input("You do not own that many, how many would you like to sell? ")
 
+    while (int(quantity) < 0):
+        quantity = input("Please enter a quantity to sell: ")
+        
     price = input("Please enter the price you want to sell for:")
     while (price == "") or (float(price) < 0):
         price = input("Please enter a price to sell(Price must be greater then $0): ")
@@ -230,17 +245,17 @@ while not QUIT:
         print("c: CLIENT SHUT DOWN")
         #  - Check if server is running
         if check_server_status():
-            #   - Send QUIT message to server
-            s.sendall("QUIT".encode())
-            #   - Wait for confirmation message from server
-            data = s.recv(MAX_LINE)
-            if b"200 OK" in data:
-                QUIT = True
-                break
+            try:
+                #   - Send QUIT message to server
+                s.sendall("QUIT".encode())
+                #   - Wait for confirmation message from server
+                data = s.recv(MAX_LINE)
+                if b"200 OK" in data:
+                    QUIT = True
+                s.close()
+            except ConnectionAbortedError:
+                pass
         QUIT = True
     user_input = ""
     
-
-# Close the connection
-s.close()
 
