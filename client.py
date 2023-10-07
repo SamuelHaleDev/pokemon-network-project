@@ -45,7 +45,8 @@ def login():
         return user_data
     else:
         print("c: Login failed.")
-        login()
+        log = login()
+        return log
         
 
 # Write the menu function that prints the options for the user
