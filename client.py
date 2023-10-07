@@ -13,6 +13,15 @@ MAX_LINE = 256 # Maximum number of bytes to receive
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a TCP socket
 s.connect((SERVER_HOST, SERVER_PORT)) # Connect to server address
 
+def check_server_status():
+    # Send a message to the server to check if it's still running
+    s.sendall(b"STATUS\n")
+    data = s.recv(MAX_LINE)
+    if data.decode().strip() == "SERVER_RUNNING":
+        return True
+    else:
+        return False
+
 def login():
     # Prompt user for username and password
     username = input("c: Enter username: ")
@@ -23,18 +32,21 @@ def login():
     data = s.recv(MAX_LINE)
     # data = 'b\'s: 200: Login successful.|\'b"(1, \'John\', \'Doe\', \'j_doe\', \'Passwrd4\', 80.0)"'
     # Parse data to separate user data from login response
-    user_data = data.split(b"|")[1]
-    data = data.split(b"|")[0]
+    response = data.split(b"|")[0]
     # Check if login was successful by checking if 200 is in data
-    if b"200" in data:
+    if b"200" in response:  
+        user_data = data.split(b"|")[1]
         print("c: Login successful.")
         # Turn user_data into a list
         user_data = user_data.decode().replace("b", "").replace("\\", "").replace("(", "").replace(")", "").replace("'", "").replace('"', "")
         user_data = user_data.split(", ")
         # Return user_data
+        print(user_data)
         return user_data
     else:
         print("c: Login failed.")
+        login()
+        
 
 # Write the menu function that prints the options for the user
 # Declare the menu function
@@ -87,10 +99,6 @@ def Buy():
     if (float(user[5]) < float(price)*int(quantity)):
         print("c: Insufficient funds. Please enter a lower price.")
         return
-    #  - CHECK IF USER ALREADY OWNS CARD
-    if (int(user[0]) == int(pokemon[len(pokemon)-1])):
-        print("c: You already own this card.")
-        return
     #  - SEND REQUEST TO SERVER
     client_request = "BUY {} {} {} {} {} {}".format(pokemon[1], pokemon[2], price, quantity, pokemon[5], user[0])
     s.sendall(client_request.encode())
@@ -110,12 +118,10 @@ def SELL():
     while pokemon == "":
         pokemon = input("Please enter a Pokemon to sell: ")
 
-    userID = input("Please input your userID: ")
-    while userID == "" or not userID.isdigit():
-        userID = input("Please input your userID: ")
+    userID = user[0]
 
-    data = "INVENTORY " + pokemon + " " + userID
-    s.sendall(data.encode())
+    inventory_request = "INVENTORY " + pokemon + " " + userID
+    s.sendall(inventory_request.encode())
     data = str(s.recv(MAX_LINE))
     ir, data, data2 = data.split("'")
     count = ""
@@ -127,8 +133,8 @@ def SELL():
         print("Pokemon Not Found")
         pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:") 
         #pokemon = "QUERYSELL " + pokemon + " " + userID
-        data = "INVENTORY " + pokemon + " " + userID
-        s.sendall(data.encode())
+        inventory_request = "INVENTORY " + pokemon + " " + userID
+        s.sendall(inventory_request.encode())
         data = str(s.recv(MAX_LINE))
         ir, data, data2 = data.split("'")
 
@@ -142,7 +148,7 @@ def SELL():
     #print(count)
 
     if pokemon == "CANCEL":
-        return;
+        return
 
     quantity = input("Please enter the quantity you want to sell: ")
     while quantity == "":
@@ -158,11 +164,11 @@ def SELL():
         price = input("Please enter a price to sell(Price must be greater then $0): ")
 
 
-    data = "SELL " + data + " " + quantity + " " + price + " " + userID
-    s.sendall(data.encode())    
+    sell_request = "SELL " + data + " " + quantity + " " + price + " " + userID
+    s.sendall(sell_request.encode())    
     #print(f"SELL {pokemon} {quantity} {price} {ID}")
 
-
+    data = s.recv(MAX_LINE)
     #cur.execute(f"UPDATE Pokemon_cards SET count = (count - {quantity}) WHERE owner_id = {user_ID} AND card_name = '{pokemon}'")
     #cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{quantity})) WHERE ID = {user_ID}")
     #print(f"Confirming the sale of\tPokemon: {pokemon}\tQuantity: {quantity}\tPrice: {price}")
@@ -170,15 +176,13 @@ def SELL():
 
 def BALANCE():
     #User Checks their balance
-    userID = input("Please input your userID: ")
-    while userID == "" or not userID.isdigit():
-        userID = input("Please input your userID: ")
-    data = "BALANCE " + userID
-    s.sendall(data.encode())
-    data = str(s.recv(MAX_LINE))
-    data = data.split("'")[1]
+    userID = user[0]
+    money = "BALANCE " + userID
+    s.sendall(money.encode())
+    money = str(s.recv(MAX_LINE))
+    money = money.split("'")[1]
     balance = ""
-    for c in data: 
+    for c in money: 
             if c.isdigit() or (c == '.'): 
                 balance = balance + c
 
@@ -223,15 +227,16 @@ while not QUIT:
         print("c:", data.decode().strip())
     if user_input == "6":
         print("c: CLIENT SHUT DOWN")
-        #   - Send QUIT message to server
-        s.sendall("QUIT".encode())
-        #   - Wait for confirmation message from server
-        data = s.recv(MAX_LINE)
-        if b"200 OK" in data:
-            QUIT = True
-        #   - Close connection
-        #   - Set QUIT to True
-        #   - Break out of while loop
+        #  - Check if server is running
+        if check_server_status():
+            #   - Send QUIT message to server
+            s.sendall("QUIT".encode())
+            #   - Wait for confirmation message from server
+            data = s.recv(MAX_LINE)
+            if b"200 OK" in data:
+                QUIT = True
+                break
+        QUIT = True
     user_input = ""
     
 
