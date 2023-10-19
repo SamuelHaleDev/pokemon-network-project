@@ -57,8 +57,13 @@ def SELL(user, s, MAX_LINE):
     #print(f"SELL {pokemon} {quantity} {price} {ID}")
 
     data = s.recv(MAX_LINE)
-    #cur.execute(f"UPDATE Pokemon_cards SET count = (count - {quantity}) WHERE owner_id = {user_ID} AND card_name = '{pokemon}'")
-    #cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{quantity})) WHERE ID = {user_ID}")
-    #print(f"Confirming the sale of\tPokemon: {pokemon}\tQuantity: {quantity}\tPrice: {price}")
+    
+    #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
+    if b"200" in data:
+        balance = data.split(b"|")[1]
+        print("c: Sold: {} {} New Balance: {}".format(quantity, pokemon, float(balance)))
+    else:
+        #  - ELSE TRANSACTION FAILED
+        print("c: Transaction failed. Server Message: {}".format(data.decode()))
     
 __all__ = ["SELL"]

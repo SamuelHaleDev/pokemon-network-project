@@ -94,31 +94,8 @@ def main():
                 else:
                     data = str(pokemon).encode()
             if "SELL" in data.decode():
-                print('s: Received', repr(data), 'from', addr)
-                # - GET THE DATA FOR SELL
-                #data = "SELL " + pokemon + " " + quantity + " " + price + " " + userID
-                pokemon = data.decode().split(" ")[1]
-                soldQuantity = data.decode().split(" ")[2]
-                price = data.decode().split(" ")[3]
-                userID = data.decode().split(" ")[4]
-                print(pokemon + " " + soldQuantity + " " + price + " " + userID)
-                cur.execute("SELECT count FROM Pokemon_cards WHERE card_name = ? AND owner_id = ?", (card_name, userID))
-                ownedQuantity = cur.fetchall()
-                if (int(ownedQuantity[0][0]) == int(soldQuantity)):
-                    cur.execute(f"UPDATE Pokemon_cards SET count = count + {soldQuantity} WHERE owner_id IS NULL AND card_name = '{pokemon}'")
-                    cur.execute(f"DELETE FROM Pokemon_cards WHERE owner_id = {userID} AND card_name = '{pokemon}'")
-                else: 
-                    #  - ADJUST THE AMOUNT OF CARDS THE OWNER STILL HAS AND CREATE OR UPDATE THE CARD WITH NULL OWNERID 
-                    cur.execute(f"UPDATE Pokemon_cards SET count = (count - {soldQuantity}) WHERE owner_id = {userID} AND card_name = '{pokemon}'")
-                    cur.execute(f"UPDATE Pokemon_cards SET count = count + {soldQuantity} WHERE owner_id IS NULL AND card_name = '{pokemon}'")
-                    if cur.rowcount == 0:
-                        #  - QUERY FROM THE POKEMON CARD WE JUST SOLD FOR THE CARD TYPE AND RARITY
-                        cur.execute(f"SELECT card_type, rarity FROM Pokemon_cards WHERE card_name = '{pokemon}'")
-                        cardData = cur.fetchall()
-                        #  - INSERT THE CARD INTO THE POKEMON CARD TABLE WITH NULL OWNERID
-                        cur.execute(f"INSERT INTO Pokemon_cards (card_name, card_type, rarity, count, owner_id) VALUES ('{pokemon}', {cardData[0][0]}, {cardData[0][1]}, {soldQuantity}, NULL)")
-                cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{soldQuantity})) WHERE ID = {userID}")
-                con.commit()
+                data = sell_route(data, addr)
+                data = data.encode()
             if "LIST" in data.decode():
                 print('s: Received', repr(data), 'from', addr)
                 #  - GRAB OWNER ID FROM CLIENT REQUEST
@@ -148,5 +125,10 @@ def buy_route(data):
     global cur, con 
     from smodules.Buy import Buy
     return Buy(cur, con, data)
+
+def sell_route(data, addr):
+    global cur, con
+    from smodules.Sell import Sell
+    return Sell(cur, con, data, addr)
 
 main()
