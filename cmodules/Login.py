@@ -1,4 +1,5 @@
 from c import MAX_LINE
+
 def Login(s):
     # Prompt user for username and password
     username = input("c: Enter username: ")
@@ -24,3 +25,5 @@ def Login(s):
         print("c: Login failed.")
         log = Login()
         return log
+    
+__all__ = ["Login"]
