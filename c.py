@@ -68,7 +68,7 @@ def main():
             if user_input == "9" and user[3] == "Root":
                 who_route()
             if user_input == "10" and user != []:
-                print("c: LOOKUP")
+                lookup_route()
             user_input = ""
 
 def buy_route(user):
@@ -105,6 +105,11 @@ def who_route():
     global s, MAX_LINE
     from cmodules.Who import Who
     Who(s, MAX_LINE)
+    
+def lookup_route():
+    global s, MAX_LINE
+    from cmodules.Lookup import Lookup
+    Lookup(s, MAX_LINE)
 
 def check_server_status():
     # Send a message to the server to check if it's still running
