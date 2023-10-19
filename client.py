@@ -225,7 +225,11 @@ while not QUIT:
         #  - BUILD CLIENT REQUEST
         print("c: LISTING ALL RECORDS IN POKEMON CARDS TABLE")
         client_request = "LIST"
-        owner_id = input("c: Enter owner ID: ")
+        owner_id = user[0]
+        if (owner_id == "ROOT"):
+            owner_id = input("c: Enter the ID of the user you want to list or type ALL to list all users: ")
+        else:
+            owner_id = user[0]
         client_request = client_request + " " + owner_id
         
         #  - SEND AND RECEIVE DATA
