@@ -1,4 +1,4 @@
-def Inventory(cur, con, data, addr):
+def Inventory(cur, data, addr):
     print('s: Received', repr(data), 'from', addr)
                 
     #  - GET CARD DATA
@@ -9,6 +9,7 @@ def Inventory(cur, con, data, addr):
     if (pokemon == []):
         data = b"NOTFOUND"
     else:
-        data = str(pokemon).encode()
+        data = str(pokemon)
+    return data
         
 __all__ = ["Inventory"]

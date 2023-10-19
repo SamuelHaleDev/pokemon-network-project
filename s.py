@@ -123,8 +123,8 @@ def sell_route(data, addr):
     return Sell(cur, con, data, addr)
 
 def inventory_route(data, addr):
-    global cur, con
+    global cur
     from smodules.Inventory import Inventory
-    return Inventory(cur, con, data, addr)
+    return Inventory(cur, data, addr)
 
 main()
