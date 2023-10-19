@@ -82,17 +82,8 @@ def main():
                 data = buy_route(data)
                 data = data.encode()
             if "INVENTORY"in data.decode():
-                print('s: Received', repr(data), 'from', addr)
-                
-                #  - GET CARD DATA
-                card_name = data.decode().split(" ")[1]
-                userID = int(data.decode().split(" ")[2])
-                pokemon = cur.execute(f"SELECT card_name, count FROM Pokemon_cards WHERE owner_id = {userID} AND card_name = '{card_name}'").fetchall()
-                # - GRAB A CARD AT A SPECIFIC USER 
-                if (pokemon == []):
-                    data = b"NOTFOUND"
-                else:
-                    data = str(pokemon).encode()
+                data = inventory_route(data, addr)
+                data = data.encode()
             if "SELL" in data.decode():
                 data = sell_route(data, addr)
                 data = data.encode()
@@ -130,5 +121,10 @@ def sell_route(data, addr):
     global cur, con
     from smodules.Sell import Sell
     return Sell(cur, con, data, addr)
+
+def inventory_route(data, addr):
+    global cur, con
+    from smodules.Inventory import Inventory
+    return Inventory(cur, con, data, addr)
 
 main()
