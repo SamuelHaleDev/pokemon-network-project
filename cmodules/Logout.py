@@ -1,9 +1,10 @@
 def Logout(user, s, MAX_LINE):
     user_name = user[3]
-    request = f"LOGOUT {user_name}\n"
+    data = f"LOGOUT {user_name}\n"
     
-    s.sendall(request.encode())
-    response = request.decode()
+    s.sendall(data.encode())
+    data = s.recv(MAX_LINE)
+    response = data.decode()
     
     if "200" in response:
         print("c: Logout successful.")
