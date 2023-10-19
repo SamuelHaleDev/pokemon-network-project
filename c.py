@@ -95,8 +95,8 @@ def balance_route(user):
     
 def list_route(user):
     global s, MAX_LINE
-    from cmodules.List import LIST
-    LIST(user, s, MAX_LINE)  
+    from cmodules.List import List
+    List(user, s, MAX_LINE)  
 
 
 def check_server_status():
