@@ -60,12 +60,12 @@ while True:
             cur.execute("SELECT * FROM Users WHERE user_name = ? AND password = ?", (username, password))
             results = cur.fetchall()
             if len(results) == 0:
-                server_response = b"s: Error 401: Username or password is incorrect."
+                server_response = b"s: Error 403: Wrong UserID or Password"
                 filler_list = [0,1]
                 data = f"{server_response}{filler_list}".encode()
             else:
                 #  - SEND USER DATA
-                server_response = b"s: 200: Login successful.|"
+                server_response = b"s: 200: OK|"
                 user_data = str(results[0]).encode()
                 print(user_data)
                 data = f"{server_response}{user_data}".encode()
