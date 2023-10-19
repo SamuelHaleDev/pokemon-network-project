@@ -62,6 +62,10 @@ def main():
                 #  - SEND BACK "SERVER_RUNNING"
                 data = b"SERVER_RUNNING"
                 data = str(data).encode()
+            if "LOGOUT" in data.decode():
+                print('s: Received LOGOUT command from', addr)
+                data = b"200 OK"
+                data = str(data).encode()
             conn.sendall(data) # Send data back to client
 
         # Close the connection
