@@ -15,7 +15,7 @@ args = parser.parse_args()
 
 # Use the server host from the command line arguments
 SERVER_HOST = args.server_host
-SERVER_PORT = 4896
+SERVER_PORT = 4897
 QUIT = False
 user_input = ""
 
@@ -225,17 +225,15 @@ while not QUIT:
         #  - BUILD CLIENT REQUEST
         print("c: LISTING ALL RECORDS IN POKEMON CARDS TABLE")
         client_request = "LIST"
-        owner_id = user[0]
-        if (owner_id == "ROOT"):
-            owner_id = input("c: Enter the ID of the user you want to list or type ALL to list all users: ")
-        else:
-            owner_id = user[0]
+        owner_id = user[3]
         client_request = client_request + " " + owner_id
         
         #  - SEND AND RECEIVE DATA
         s.sendall(client_request.encode())
         data = s.recv(MAX_LINE)
-        print(data.decode())
+        if b"200 OK" in data:
+            response = data.decode().split("|")[1].strip()
+            print(response)
     if user_input == "4":
         BALANCE()
         #   - Print user's balance

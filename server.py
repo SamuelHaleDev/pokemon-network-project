@@ -6,7 +6,7 @@ con = sqlite3.connect("Pokemon.db") # Connect to database
 cur = con.cursor() # Create cursor object
 
 # Define server port
-PORT = 4896 # Port number is a 16-bit unsigned integer
+PORT = 4897 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
 
@@ -54,7 +54,7 @@ while True:
             print('s: Received', repr(data), 'from', addr)
             #  - GET USERNAME AND PASSWORD
             username = data.decode().split(" ")[1]
-            password = data.decode().split(" ")[2]
+            password = data.decode().split(" ")[2].replace("\n", "")
             
             #  - CHECK IF USERNAME AND PASSWORD ARE CORRECT
             cur.execute("SELECT * FROM Users WHERE user_name = ? AND password = ?", (username, password))
@@ -155,17 +155,21 @@ while True:
             cur.execute(f"UPDATE Users SET usd_balance = (usd_balance + ({price}*{soldQuantity})) WHERE ID = {userID}")
             con.commit()
         if "LIST" in data.decode():
+            print('s: Received', repr(data), 'from', addr)
             #  - GRAB OWNER ID FROM CLIENT REQUEST
-            owner_id = data.decode().split(" ")[1]
-            if owner_id == "NULL":
+            user_name = data.decode().split(" ")[1]
+            if user_name == "Root":
                 #  - GRAB ALL CARD DATA WHERE OWNER ID is NULL
-                cur.execute("SELECT * FROM Pokemon_cards WHERE owner_id IS NULL")
+                cur.execute("SELECT * FROM Pokemon_cards")
             else:
+                #  - QUERY FOR USER_ID FROM USER_NAME
+                cur.execute("SELECT ID FROM Users WHERE user_name = ?", (user_name,))
+                owner_id = cur.fetchall()[0][0]
                 #  - GRAB ALL CARD DATA WHERE OWNER ID = OWNER ID
-                cur.execute("SELECT * FROM Pokemon_cards WHERE owner_id = ?", (owner_id))
+                cur.execute("SELECT * FROM Pokemon_cards WHERE owner_id = ?", (owner_id,))
             results = cur.fetchall()
             #  - SEND CARD DATA
-            data = str(results).encode()
+            data = f"200 OK|{str(results)}".encode()
         if "STATUS" in data.decode():
             #  - SEND BACK "SERVER_RUNNING"
             data = b"SERVER_RUNNING"
