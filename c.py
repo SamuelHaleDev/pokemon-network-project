@@ -40,6 +40,16 @@ def login_route():
     from cmodules.Login import Login
     return Login(s)
 
+def balance_route(user):
+    global s
+    from cmodules.Balance import BALANCE
+    BALANCE(user, s)
+    
+def list_route(user):
+    global s
+    from cmodules.List import LIST
+    LIST(user, s)  
+
 def check_server_status():
     # Send a message to the server to check if it's still running
     s.sendall(b"STATUS\n")
@@ -70,20 +80,6 @@ def menu():
     # Return user input
     return option  
 
-def BALANCE():
-    #User Checks their balance
-    userID = user[0]
-    money = "BALANCE " + userID
-    s.sendall(money.encode())
-    money = str(s.recv(MAX_LINE))
-    money = money.split("'")[1]
-    balance = ""
-    for c in money: 
-            if c.isdigit() or (c == '.'): 
-                balance = balance + c
-
-    print(balance)
-
 if __name__ == "__main__":
     while not QUIT:
         user = []
@@ -96,21 +92,9 @@ if __name__ == "__main__":
             if user_input == "2" and user != []:
                 sell_route(user)
             if user_input == "3" and user != []:
-                #  - BUILD CLIENT REQUEST
-                print("c: LISTING ALL RECORDS IN POKEMON CARDS TABLE")
-                client_request = "LIST"
-                owner_id = user[3]
-                client_request = client_request + " " + owner_id
-                
-                #  - SEND AND RECEIVE DATA
-                s.sendall(client_request.encode())
-                data = s.recv(MAX_LINE)
-                if b"200 OK" in data:
-                    response = data.decode().split("|")[1].strip()
-                    print(response)
+                list_route(user)
             if user_input == "4" and user != []:
-                BALANCE()
-                #   - Print user's balance
+                balance_route(user)
             if user_input == "5" and user != [] and user[3] == "Root":
                 print("c: SERVER SHUT DOWN")
                 #   - Send message to server to shut down
