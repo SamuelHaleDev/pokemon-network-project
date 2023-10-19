@@ -1,6 +1,4 @@
-from c import MAX_LINE
-
-def Buy(user, s):
+def Buy(user, s, MAX_LINE):
     #  - GET CARD DATA
     user_input = input("c: Enter card name: ")
     user_input = "QUERY " + user_input

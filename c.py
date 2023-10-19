@@ -15,9 +15,7 @@ parser.add_argument('server_host', type=str, help='The hostname or IP address of
 
 # Use the server host from the command line arguments
 SERVER_HOST = "localhost"
-SERVER_PORT = 4897
-QUIT = False
-user_input = ""
+SERVER_PORT = 4898
 
 MAX_LINE = 256 # Maximum number of bytes to receive
 
@@ -26,6 +24,8 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a TCP socket
 s.connect((SERVER_HOST, SERVER_PORT)) # Connect to server address
 
 def main():
+    QUIT = False
+    user_input = ""
     while not QUIT:
         user = []
         while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6":
@@ -72,31 +72,32 @@ def main():
             if user_input == "10" and user != []:
                 print("c: LOOKUP")
             user_input = ""
-            
+
 def buy_route(user):
-    global s
+    global s, MAX_LINE
     from cmodules.Buy import Buy
-    Buy(user, s)
+    Buy(user, s, MAX_LINE)
     
 def sell_route(user):
-    global s
+    global s, MAX_LINE
     from cmodules.Sell import SELL
-    SELL(user, s)
+    SELL(user, s, MAX_LINE)
     
 def login_route():
-    global s
+    global s, MAX_LINE
     from cmodules.Login import Login
-    return Login(s)
+    return Login(s, MAX_LINE)
 
 def balance_route(user):
-    global s
-    from cmodules.Balance import BALANCE
-    BALANCE(user, s)
+    global s, MAX_LINE
+    from cmodules.Balance import Balance 
+    Balance(user, s, MAX_LINE)
     
 def list_route(user):
-    global s
+    global s, MAX_LINE
     from cmodules.List import LIST
-    LIST(user, s)  
+    LIST(user, s, MAX_LINE)  
+
 
 def check_server_status():
     # Send a message to the server to check if it's still running

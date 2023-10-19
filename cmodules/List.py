@@ -1,6 +1,4 @@
-from c import MAX_LINE
-
-def List(user, s):
+def List(user, s, MAX_LINE):
     #  - BUILD CLIENT REQUEST
     print("c: LISTING ALL RECORDS IN POKEMON CARDS TABLE")
     client_request = "LIST"

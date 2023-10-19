@@ -1,6 +1,4 @@
-from c import MAX_LINE
-
-def Login(s):
+def Login(s, MAX_LINE):
     # Prompt user for username and password
     username = input("c: Enter username: ")
     password = input("c: Enter password: ")

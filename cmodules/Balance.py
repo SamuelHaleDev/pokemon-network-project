@@ -1,6 +1,4 @@
-from c import MAX_LINE
-
-def BALANCE(user, s):
+def Balance(user, s, MAX_LINE):
     #User Checks their balance
     userID = user[0]
     money = "BALANCE " + userID
@@ -14,4 +12,4 @@ def BALANCE(user, s):
 
     print(balance)
     
-__all__ = ["BALANCE"]
+__all__ = ["Balance"]

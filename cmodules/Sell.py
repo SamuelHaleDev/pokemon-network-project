@@ -1,6 +1,4 @@
-from c import MAX_LINE
-
-def SELL(user, s):
+def SELL(user, s, MAX_LINE):
     pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:")
     while pokemon == "":
         pokemon = input("Please enter a Pokemon to sell: ")

@@ -6,7 +6,7 @@ con = sqlite3.connect("Pokemon.db") # Connect to database
 cur = con.cursor() # Create cursor object
 
 # Define server port
-PORT = 4897 # Port number is a 16-bit unsigned integer
+PORT = 4898 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
 
@@ -79,43 +79,8 @@ def main():
                 balance = cur.fetchall()
                 data = str(balance).encode()
             if "BUY" in data.decode():
-                #  - GRAB CLIENT REQUEST
-                client_request = data.decode().replace("BUY ", "").split(" ")
-                print("s: RECEIVED {}".format(client_request))
-                
-                #  - GRAB CARD DATA
-                card_name = data.decode().split(" ")[1]
-                cur.execute("SELECT * FROM Pokemon_cards WHERE card_name = ?", (card_name,))
-                results = cur.fetchall()
-                
-                #  - CHECK IF CARD EXISTS. IF NOT, SEND ERROR MESSAGE
-                if len(results) == 0:
-                    data = b"s: Error 403: Card does not exist."
-                else:
-                    #  - CHECK IF USER IS BUYING ALL CARDS. IF SO, UPDATE OWNER_ID. 
-                    if int(client_request[3]) == int(results[0][4]):
-                        cur.execute("UPDATE Pokemon_cards SET owner_id = ? WHERE card_name = ?", (int(client_request[5]), card_name))
-                    else:
-                        #  - IF NOT, UPDATE COUNT AND ADD NEW ROW
-                        cur.execute("UPDATE Pokemon_cards SET count = count - ? WHERE card_name = ? AND owner_id IS NULL",
-                                    (int(client_request[3]), card_name))
-                        #  - UPDATE ROW IF ROW EXISTS
-                        cur.execute("UPDATE Pokemon_cards SET count = count + ? WHERE card_name = ? AND owner_id = ?",
-                                    (int(client_request[3]), card_name, int(client_request[5])))
-                        if cur.rowcount == 0:
-                            # If user doesn't own the card, insert a new row
-                            cur.execute("INSERT INTO Pokemon_cards(card_name, card_type, rarity, count, owner_id) VALUES (?, ?, ?, ?, ?)"
-                                        , (card_name, results[0][2], results[0][3], int(client_request[3]), int(client_request[5])))
-                    cur.execute("UPDATE Users SET usd_balance = usd_balance - ? WHERE ID = ?", (
-                        int(client_request[3])*float(client_request[2]), int(client_request[5])))
-                    con.commit()
-                    
-                    #  - GRAB NEW BALANCE
-                    cur.execute("SELECT * FROM Users WHERE ID = ?", (int(client_request[5]),))
-                    balance = cur.fetchall()
-                    
-                    #  - SEND SUCCESS MESSAGE WITH NEW BALANCE
-                    data = f"200 OK|{balance[0][5]}".encode()
+                data = buy_route(data)
+                data = data.encode()
             if "INVENTORY"in data.decode():
                 print('s: Received', repr(data), 'from', addr)
                 
@@ -178,5 +143,10 @@ def main():
 
         # Close the connection
         conn.close()
-        
+
+def buy_route(data):
+    global cur, con 
+    from smodules.Buy import Buy
+    return Buy(cur, con, data)
+
 main()
