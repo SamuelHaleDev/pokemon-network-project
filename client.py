@@ -39,7 +39,7 @@ def login():
     username = input("c: Enter username: ")
     password = input("c: Enter password: ")
     # Send "LOGIN" + username + password to server
-    s.sendall(("LOGIN " + username + " " + password).encode())
+    s.sendall(("LOGIN " + username + " " + password + "\n").encode())
     # Receive response from server
     data = s.recv(MAX_LINE)
     # data = 'b\'s: 200: Login successful.|\'b"(1, \'John\', \'Doe\', \'j_doe\', \'Passwrd4\', 80.0)"'
