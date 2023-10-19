@@ -29,6 +29,11 @@ def buy_route(user):
     global s
     from cmodules.Buy import Buy
     Buy(user, s)
+    
+def login_route():
+    global s
+    from cmodules.Login import Login
+    return Login(s)
 
 def check_server_status():
     # Send a message to the server to check if it's still running
@@ -38,33 +43,6 @@ def check_server_status():
         return True
     else:
         return False
-
-def login():
-    # Prompt user for username and password
-    username = input("c: Enter username: ")
-    password = input("c: Enter password: ")
-    # Send "LOGIN" + username + password to server
-    s.sendall(("LOGIN " + username + " " + password + "\n").encode())
-    # Receive response from server
-    data = s.recv(MAX_LINE)
-    # data = 'b\'s: 200: Login successful.|\'b"(1, \'John\', \'Doe\', \'j_doe\', \'Passwrd4\', 80.0)"'
-    # Parse data to separate user data from login response
-    response = data.split(b"|")[0]
-    # Check if login was successful by checking if 200 is in data
-    if b"200" in response:  
-        user_data = data.split(b"|")[1]
-        print("c: Login successful.")
-        # Turn user_data into a list
-        user_data = user_data.decode().replace("b", "").replace("\\", "").replace("(", "").replace(")", "").replace("'", "").replace('"', "")
-        user_data = user_data.split(", ")
-        # Return user_data
-        print(user_data)
-        return user_data
-    else:
-        print("c: Login failed.")
-        log = login()
-        return log
-        
 
 # Write the menu function that prints the options for the user
 # Declare the menu function
@@ -220,7 +198,7 @@ if __name__ == "__main__":
                         pass
                 QUIT = True
             if user_input == "7":
-                user = login()
+                user = login_route()
             if user_input == "8" and user != []:
                 user = []
                 print("c: LOGOUT")

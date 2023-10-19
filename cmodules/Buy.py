@@ -1,4 +1,4 @@
-from c import MAX_LINE, socket
+from c import MAX_LINE
 
 def Buy(user, s):
     #  - GET CARD DATA
