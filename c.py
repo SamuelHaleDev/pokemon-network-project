@@ -64,7 +64,7 @@ def main():
             if user_input == "7":
                 user = login_route()
             if user_input == "8" and user != []:
-                user = []
+                user = logout_route(user)
             if user_input == "9" and user != []:
                 print("c: WHO")
             if user_input == "10" and user != []:
@@ -95,6 +95,11 @@ def list_route(user):
     global s, MAX_LINE
     from cmodules.List import List
     List(user, s, MAX_LINE)  
+    
+def logout_route(user):
+    global s, MAX_LINE
+    from cmodules.Logout import Logout
+    return Logout(user, s, MAX_LINE)
 
 def check_server_status():
     # Send a message to the server to check if it's still running
