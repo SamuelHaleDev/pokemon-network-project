@@ -44,14 +44,8 @@ def main():
                 data = login_route(data, addr)
                 data = data.encode()
             if "BALANCE" in data.decode():
-                print('s: Received', repr(data), 'from', addr)
-                #  - GRAB OWNER ID FROM CLIENT REQUEST
-                owner_id = data.decode().split(" ")[1]
-                # - GRAB THE BALANCE OF THE USER
-                # - clear cur object
-                cur.execute(f"SELECT usd_balance FROM Users WHERE ID = {owner_id}")
-                balance = cur.fetchall()
-                data = str(balance).encode()
+                data = balance_route(data, addr)
+                data = data.encode()
             if "BUY" in data.decode():
                 data = buy_route(data)
                 data = data.encode()
@@ -102,5 +96,10 @@ def list_route(data, addr):
     global cur
     from smodules.List import List
     return List(cur, data, addr)
+
+def balance_route(data, addr):
+    global cur
+    from smodules.Balance import Balance
+    return Balance(cur, data, addr)
 
 main()
