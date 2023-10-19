@@ -46,7 +46,7 @@ def main():
                 s.sendall(b"SHUTDOWN\n")
                 data = s.recv(MAX_LINE)
                 print("c:", data.decode().strip())
-            if user_input == "6" and user != [] and user[3] == "Root":
+            if user_input == "6":
                 print("c: CLIENT SHUT DOWN")
                 #  - Check if server is running
                 if check_server_status():
@@ -65,8 +65,6 @@ def main():
                 user = login_route()
             if user_input == "8" and user != []:
                 user = []
-                print("c: LOGOUT")
-                #  - Code logout functionality in a separate module
             if user_input == "9" and user != []:
                 print("c: WHO")
             if user_input == "10" and user != []:
@@ -97,7 +95,6 @@ def list_route(user):
     global s, MAX_LINE
     from cmodules.List import List
     List(user, s, MAX_LINE)  
-
 
 def check_server_status():
     # Send a message to the server to check if it's still running
