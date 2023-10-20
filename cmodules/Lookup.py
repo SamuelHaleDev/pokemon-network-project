@@ -6,7 +6,7 @@ def Lookup(s, MAX_LINE):
     response = response.decode()
     
     if "200" in response:
-        print("Pokemon records found:")
+        print("Pokemon records found:", response.split("|")[1])
     else:
         print("No pokemon records found.")
         return

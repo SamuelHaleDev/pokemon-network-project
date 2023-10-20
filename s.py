@@ -69,6 +69,9 @@ def main():
             if "WHO" in data.decode():
                 data = f"200 OK"
                 data = data.encode()
+            if "LOOKUP" in data.decode():
+                data = lookup_route(data, addr)
+                data = data.encode()
             conn.sendall(data) # Send data back to client
 
         # Close the connection
@@ -108,5 +111,10 @@ def balance_route(data, addr):
     global cur
     from smodules.Balance import Balance
     return Balance(cur, data, addr)
+
+def lookup_route(data, addr):
+    global cur
+    from smodules.Lookup import Lookup
+    return Lookup(cur, con, data, addr)
 
 main()
