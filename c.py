@@ -40,13 +40,13 @@ def main():
                 list_route(user)
             if user_input == "4" and user != []:
                 balance_route(user)
-            if user_input == "5" and user != [] and user[3] == "Root":
+            if user_input == "10" and user != [] and user[3] == "Root":
                 print("c: SERVER SHUT DOWN")
                 #   - Send message to server to shut down
                 s.sendall(b"SHUTDOWN\n")
                 data = s.recv(MAX_LINE)
                 print("c:", data.decode().strip())
-            if user_input == "6":
+            if user_input == "11":
                 print("c: CLIENT SHUT DOWN")
                 #  - Check if server is running
                 if check_server_status():
@@ -65,10 +65,12 @@ def main():
                 user = login_route()
             if user_input == "8" and user != []:
                 user = logout_route(user)
-            if user_input == "9" and user[3] == "Root":
+            if user_input == "5" and user[3] == "Root":
                 who_route()
-            if user_input == "10" and user != []:
+            if user_input == "6" and user != []:
                 lookup_route()
+            if user_input == "9" and user != []:
+                deposit_route(user)
             user_input = ""
 
 def buy_route(user):
@@ -110,6 +112,11 @@ def lookup_route():
     global s, MAX_LINE
     from cmodules.Lookup import Lookup
     Lookup(s, MAX_LINE)
+    
+def deposit_route(user):
+    global s, MAX_LINE
+    from cmodules.Deposit import Deposit
+    Deposit(user, s, MAX_LINE)
 
 def check_server_status():
     # Send a message to the server to check if it's still running
@@ -128,12 +135,13 @@ def menu():
     print("2. SELL")
     print("3. LISTING ALL RECORDS IN POKEMON CARDS TABLE")
     print("4. BALANCE")
-    print("5. SERVER SHUT DOWN")
-    print("6. CLIENT SHUT DOWN")
+    print("5. WHO")
+    print("6. LOOKUP")
     print("7. LOGIN")
     print("8. LOGOUT")
-    print("9. WHO")
-    print("10. LOOKUP")
+    print("9. DEPOSIT")
+    print("10. SERVER SHUT DOWN")
+    print("11. CLIENT SHUT DOWN")
     
     # Prompt user for input
     option = input("c: Enter option: ")
