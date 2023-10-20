@@ -5,7 +5,7 @@ def Deposit(user, s, MAX_LINE):
             dep_amount = int(input("Enter amount to deposit: "))
         except ValueError:
             print("Invalid amount.")
-    request = f"DEPOSIT {dep_amount}\n"
+    request = f"DEPOSIT {dep_amount} {user[3]}\n"
     s.sendall(request.encode())
     response = s.recv(MAX_LINE)
     response = response.decode()

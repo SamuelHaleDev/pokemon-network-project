@@ -72,6 +72,9 @@ def main():
             if "LOOKUP" in data.decode():
                 data = lookup_route(data, addr)
                 data = data.encode()
+            if "DEPOSIT" in data.decode():
+                data = deposit_route(data, addr)
+                data = data.encode()
             conn.sendall(data) # Send data back to client
 
         # Close the connection
@@ -116,5 +119,10 @@ def lookup_route(data, addr):
     global cur
     from smodules.Lookup import Lookup
     return Lookup(cur, con, data, addr)
+
+def deposit_route(data, addr):
+    global cur
+    from smodules.Deposit import Deposit
+    return Deposit(cur, con, data, addr)
 
 main()
