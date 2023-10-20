@@ -21,7 +21,7 @@ def Login(s, MAX_LINE):
         return user_data
     else:
         print("c: Login failed.")
-        log = Login()
+        log = Login(s, MAX_LINE)
         return log
     
 __all__ = ["Login"]
