@@ -1,5 +1,7 @@
 import socket
 import sqlite3
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 con = sqlite3.connect("Pokemon.db") # Connect to database
 
@@ -9,6 +11,9 @@ cur = con.cursor() # Create cursor object
 PORT = 4898 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
+connected_clients = 0
+
+clients_lock = threading.Lock()
 
 # Passive open
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a TCP socket
@@ -16,11 +21,22 @@ s.bind(('', PORT)) # Bind the socket to the port
 s.listen(MAX_PENDING) # Listen for connection
 
 def main():
-    while True:
-        conn, addr = s.accept() # Accept a connection
+    with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
+        while True:
+            conn, addr = s.accept() # Accept a connection
+            
+            executor.submit(handle_client_route, conn, addr)
 
 def handle_client_route(conn, addr):
+    global connected_clients
+    with clients_lock:
+        connected_clients += 1
+        print(f"s: New connection from {addr}. {connected_clients} connected clients.")
     from smodules.Client import handle_client
     handle_client(conn, addr, MAX_LINE, s, con, cur)
+    
+    with clients_lock:
+        connected_clients -= 1
+        print(f"s: Connection from {addr} closed. {connected_clients} connected clients.")
 
 main()
