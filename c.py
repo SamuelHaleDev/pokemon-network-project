@@ -14,8 +14,8 @@ parser.add_argument('server_host', type=str, help='The hostname or IP address of
 #args = parser.parse_args()
 
 # Use the server host from the command line arguments
-SERVER_HOST = "localhost"
-SERVER_PORT = 4898
+SERVER_HOST = "08f4-2601-40b-301-a7e0-54cd-6236-97e0-da76.ngrok-free.app"
+SERVER_PORT = 443
 
 MAX_LINE = 256 # Maximum number of bytes to receive
 
