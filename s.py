@@ -8,7 +8,7 @@ con = sqlite3.connect("Pokemon.db") # Connect to database
 cur = con.cursor() # Create cursor object
 
 # Define server port
-PORT = 4898 # Port number is a 16-bit unsigned integer
+PORT = 4987 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
 connected_clients = 0
