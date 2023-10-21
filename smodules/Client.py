@@ -1,45 +1,36 @@
-def buy_route(data):
-    global cur, con 
+def buy_route(data, cur, con):
     from smodules.Buy import Buy
     return Buy(cur, con, data)
 
-def sell_route(data, addr):
-    global cur, con
+def sell_route(data, addr, cur, con):
     from smodules.Sell import Sell
     return Sell(cur, con, data, addr)
 
-def inventory_route(data, addr):
-    global cur
+def inventory_route(data, addr, cur):
     from smodules.Inventory import Inventory
     return Inventory(cur, data, addr)
 
-def query_route(data, addr):
-    global cur
+def query_route(data, addr, cur):
     from smodules.Query import Query
     return Query(cur, data, addr)
 
-def login_route(data, addr):
-    global cur
+def login_route(data, addr, cur):
     from smodules.Login import Login
     return Login(cur, data, addr)
 
-def list_route(data, addr):
-    global cur
+def list_route(data, addr, cur):
     from smodules.List import List
     return List(cur, data, addr)
 
-def balance_route(data, addr):
-    global cur
+def balance_route(data, addr, cur):
     from smodules.Balance import Balance
     return Balance(cur, data, addr)
 
-def lookup_route(data, addr):
-    global cur
+def lookup_route(data, addr, cur, con):
     from smodules.Lookup import Lookup
     return Lookup(cur, con, data, addr)
 
-def deposit_route(data, addr):
-    global cur
+def deposit_route(data, addr, cur, con):
     from smodules.Deposit import Deposit
     return Deposit(cur, con, data, addr)
 
@@ -64,25 +55,25 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur):
             data = b"200 OK"
 
         if "QUERY" in data.decode():
-            data = query_route(data, addr)
+            data = query_route(data, addr, cur)
             data = data.encode()
         if "LOGIN" in data.decode():
-            data = login_route(data, addr)
+            data = login_route(data, addr, cur)
             data = data.encode()
         if "BALANCE" in data.decode():
-            data = balance_route(data, addr)
+            data = balance_route(data, addr, cur)
             data = data.encode()
         if "BUY" in data.decode():
-            data = buy_route(data)
+            data = buy_route(data, addr, cur, con)
             data = data.encode()
         if "INVENTORY"in data.decode():
-            data = inventory_route(data, addr)
+            data = inventory_route(data, addr, cur)
             data = data.encode()
         if "SELL" in data.decode():
-            data = sell_route(data, addr)
+            data = sell_route(data, addr, cur, con)
             data = data.encode()
         if "LIST" in data.decode():
-            data = list_route(data, addr)
+            data = list_route(data, addr, cur)
             data = data.encode()
         if "STATUS" in data.decode():
             #  - SEND BACK "SERVER_RUNNING"
@@ -96,10 +87,10 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur):
             data = f"200 OK"
             data = data.encode()
         if "LOOKUP" in data.decode():
-            data = lookup_route(data, addr)
+            data = lookup_route(data, addr, cur, con)
             data = data.encode()
         if "DEPOSIT" in data.decode():
-            data = deposit_route(data, addr)
+            data = deposit_route(data, addr, cur, con)
             data = data.encode()
         conn.sendall(data) # Send data back to client
 

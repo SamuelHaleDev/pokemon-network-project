@@ -28,7 +28,7 @@ def main():
             executor.submit(handle_client_route, conn, addr)
 
 def handle_client_route(conn, addr):
-    global connected_clients
+    global connected_clients, MAX_LINE, s, con, cur
     with clients_lock:
         connected_clients += 1
         print(f"s: New connection from {addr}. {connected_clients} connected clients.")
