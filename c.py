@@ -15,7 +15,7 @@ parser.add_argument('server_host', type=str, help='The hostname or IP address of
 
 # Use the server host from the command line arguments
 SERVER_HOST = "localhost"
-SERVER_PORT = 4898
+SERVER_PORT = 4987
 
 MAX_LINE = 256 # Maximum number of bytes to receive
 

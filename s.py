@@ -1,14 +1,17 @@
 import socket
 import sqlite3
-
-con = sqlite3.connect("Pokemon.db") # Connect to database
-
-cur = con.cursor() # Create cursor object
+from concurrent.futures import ThreadPoolExecutor
+import threading
+import queue
 
 # Define server port
-PORT = 4898 # Port number is a 16-bit unsigned integer
+PORT = 4987 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
+connected_clients = 0
+connection_pool = queue.Queue(maxsize=MAX_PENDING)
+
+clients_lock = threading.Lock()
 
 # Passive open
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # Create a TCP socket
@@ -16,113 +19,34 @@ s.bind(('', PORT)) # Bind the socket to the port
 s.listen(MAX_PENDING) # Listen for connection
 
 def main():
-    while True:
-        conn, addr = s.accept() # Accept a connection
-        print('s: Connected by', addr) # Print client address
-
+    with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
         while True:
-            data = conn.recv(MAX_LINE) # Receive data from client
-            if not data: break # Break if no more data
+            conn, addr = s.accept() # Accept a connection
+            
+            executor.submit(handle_client_route, conn, addr)
+            
+def create_connection():
+    return sqlite3.connect("Pokemon.db")
 
-            if data.decode().strip() == "SHUTDOWN":
-                print('s: Received:', data.decode().strip())
-                conn.sendall(b"200 OK\n")
-                conn.close()
-                s.close()
-                con.close() # Close the database connection
-                exit() # Terminate the server
+def get_connection():
+    global MAX_PENDING, connection_pool
+    with clients_lock:
+        if connection_pool.qsize() < MAX_PENDING:
+            connection_pool.put(create_connection())
+        return connection_pool.get()
 
-            if "QUIT" in data.decode():
-                print('s: Received QUIT command from', addr)
-                #   - Send confirmation message back to client
-                data = b"200 OK"
-
-            if "QUERY" in data.decode():
-                data = query_route(data, addr)
-                data = data.encode()
-            if "LOGIN" in data.decode():
-                data = login_route(data, addr)
-                data = data.encode()
-            if "BALANCE" in data.decode():
-                data = balance_route(data, addr)
-                data = data.encode()
-            if "BUY" in data.decode():
-                data = buy_route(data)
-                data = data.encode()
-            if "INVENTORY"in data.decode():
-                data = inventory_route(data, addr)
-                data = data.encode()
-            if "SELL" in data.decode():
-                data = sell_route(data, addr)
-                data = data.encode()
-            if "LIST" in data.decode():
-                data = list_route(data, addr)
-                data = data.encode()
-            if "STATUS" in data.decode():
-                #  - SEND BACK "SERVER_RUNNING"
-                data = f"SERVER_RUNNING"
-                data = data.encode()
-            if "LOGOUT" in data.decode():
-                print('s: Received LOGOUT command from', addr)
-                data = f"200 OK"
-                data = data.encode()
-            if "WHO" in data.decode():
-                data = f"200 OK"
-                data = data.encode()
-            if "LOOKUP" in data.decode():
-                data = lookup_route(data, addr)
-                data = data.encode()
-            if "DEPOSIT" in data.decode():
-                data = deposit_route(data, addr)
-                data = data.encode()
-            conn.sendall(data) # Send data back to client
-
-        # Close the connection
-        conn.close()
-
-def buy_route(data):
-    global cur, con 
-    from smodules.Buy import Buy
-    return Buy(cur, con, data)
-
-def sell_route(data, addr):
-    global cur, con
-    from smodules.Sell import Sell
-    return Sell(cur, con, data, addr)
-
-def inventory_route(data, addr):
-    global cur
-    from smodules.Inventory import Inventory
-    return Inventory(cur, data, addr)
-
-def query_route(data, addr):
-    global cur
-    from smodules.Query import Query
-    return Query(cur, data, addr)
-
-def login_route(data, addr):
-    global cur
-    from smodules.Login import Login
-    return Login(cur, data, addr)
-
-def list_route(data, addr):
-    global cur
-    from smodules.List import List
-    return List(cur, data, addr)
-
-def balance_route(data, addr):
-    global cur
-    from smodules.Balance import Balance
-    return Balance(cur, data, addr)
-
-def lookup_route(data, addr):
-    global cur
-    from smodules.Lookup import Lookup
-    return Lookup(cur, con, data, addr)
-
-def deposit_route(data, addr):
-    global cur
-    from smodules.Deposit import Deposit
-    return Deposit(cur, con, data, addr)
+def handle_client_route(conn, addr):
+    global connected_clients, MAX_LINE, s
+    con = get_connection()
+    cur = con.cursor()
+    with clients_lock:
+        connected_clients += 1
+        print(f"s: New connection from {addr}. {connected_clients} connected clients.")
+    from smodules.Client import handle_client
+    handle_client(conn, addr, MAX_LINE, s, con, cur)
+    
+    with clients_lock:
+        connected_clients -= 1
+        print(f"s: Connection from {addr} closed. {connected_clients} connected clients.")
 
 main()
