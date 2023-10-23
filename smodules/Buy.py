@@ -1,7 +1,7 @@
-def Buy(cur, con, data):
+def Buy(cur, addr, con, data):
     #  - GRAB CLIENT REQUEST
     client_request = data.decode().replace("BUY ", "").split(" ")
-    print("s: RECEIVED {}".format(client_request))
+    print("s: RECEIVED {} FROM ADDRESS {}".format(client_request, addr))
     
     #  - GRAB CARD DATA
     card_name = data.decode().split(" ")[1]

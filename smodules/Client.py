@@ -1,6 +1,6 @@
-def buy_route(data, cur, con):
+def buy_route(data, addr, cur, con):
     from smodules.Buy import Buy
-    return Buy(cur, con, data)
+    return Buy(cur, addr, con, data)
 
 def sell_route(data, addr, cur, con):
     from smodules.Sell import Sell
