@@ -1,8 +1,8 @@
-def Buy(user, s, MAX_LINE):
+def Buy(user, s, MAX_LINE, request_queue):
     #  - GET CARD DATA
     user_input = input("c: Enter card name: ")
     user_input = "QUERY " + user_input
-    s.sendall(user_input.encode())
+    request_queue.put(user_input)
     data = s.recv(MAX_LINE)
     if b"Error" in data:
         print(data.decode())
@@ -31,7 +31,7 @@ def Buy(user, s, MAX_LINE):
         return
     #  - SEND REQUEST TO SERVER
     client_request = "BUY {} {} {} {} {} {}".format(pokemon[1], pokemon[2], price, quantity, pokemon[5], user[0])
-    s.sendall(client_request.encode())
+    request_queue.put(client_request)
     data = s.recv(MAX_LINE)
     
     #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
