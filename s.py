@@ -43,7 +43,7 @@ def handle_client_route(conn, addr):
         connected_clients += 1
         print(f"s: New connection from {addr}. {connected_clients} connected clients.")
     from smodules.Client import handle_client
-    handle_client(conn, addr, MAX_LINE, s, con, cur)
+    handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients)
     
     with clients_lock:
         connected_clients -= 1

@@ -6,6 +6,9 @@ def handle_response(s, MAX_LINE, response_queue):
         if "200" in response:
             if "|" in response:
                 return_data = data.decode().split("|")[1].strip()
+                if "QUIT" in return_data:
+                    response_queue.put("200")
+                    break
             else :
                 return_data = response
             response_queue.put(return_data)

@@ -1,7 +1,6 @@
 import socket
 import queue
 import threading
-from typing import List
 from cmodules.Request import handle_request
 from cmodules.Response import handle_response
 
@@ -38,10 +37,10 @@ def main():
     response_thread.start()
     while not QUIT:
         user = []
-        while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6":
+        while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11":
             user_input = menu()
-            if (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10"):
-                print("c: Invalid input. Please enter a number between 1 and 6.")
+            while (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11"):
+                user_input = input("c: Invalid input. Please enter a number between 1 and 6.")
             if user_input == "1" and user != []:
                 buy_route(user, request_queue, response_queue)
             if user_input == "2" and user != []:
@@ -53,24 +52,29 @@ def main():
             if user_input == "10" and user != [] and user[3] == "Root":
                 print("c: SERVER SHUT DOWN")
                 #   - Send message to server to shut down
-                request_queue.put(b"SHUTDOWN\n")
+                request_queue.put("SHUTDOWN\n")
                 data = s.recv(MAX_LINE)
                 print("c:", data.decode().strip())
             if user_input == "11":
                 print("c: CLIENT SHUT DOWN")
                 #  - Check if server is running
-                if check_server_status():
+                if check_server_status(request_queue, response_queue):
                     try:
                         #   - Send QUIT message to server
-                        request_queue.put(b"QUIT\n")
+                        request_queue.put("QUIT\n")
                         #   - Wait for confirmation message from server
-                        data = s.recv(MAX_LINE)
-                        if b"200 OK" in data:
+                        data = response_queue.get()
+                        if "200" in data:
                             QUIT = True
-                        s.close()
+                            request_thread.join()
+                            response_thread.join()
+                            s.close()
+                            print("c: Connection closed.")
+                            break
+                        else:
+                            print("c: Error closing connection.")
                     except ConnectionAbortedError:
                         pass
-                QUIT = True
             if user_input == "7":
                 user = login_route(request_queue, response_queue)
             if user_input == "8" and user != []:
@@ -134,7 +138,7 @@ def deposit_route(user, request_queue, response_queue):
 
 def check_server_status(request_queue, response_queue):
     # Send a message to the server to check if it's still running
-    request_queue.put(b"STATUS\n")
+    request_queue.put("STATUS\n")
     data = response_queue.get()
     if "SERVER_RUNNING" in data:
         return True

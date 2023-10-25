@@ -30,7 +30,7 @@ def deposit_route(data, addr, cur, con):
     from smodules.Deposit import Deposit
     return Deposit(cur, con, data, addr)
 
-def handle_client(conn, addr, MAX_LINE, s, con, cur):
+def handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients):
     print('s: Connected by', addr) # Print client address
 
     while True:
@@ -47,8 +47,9 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur):
 
         if "QUIT" in data.decode():
             print('s: Received QUIT command from', addr)
-            #   - Send confirmation message back to client
-            data = b"200 OK"
+            print('s: Client from {} disconnected.'.format(addr))
+            connected_clients -= 1
+            data = b"200 OK|QUIT"
         if "LOGIN" in data.decode():
             data = login_route(data, addr, cur)
             data = data.encode()
@@ -69,7 +70,7 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur):
             data = data.encode()
         if "STATUS" in data.decode():
             #  - SEND BACK "SERVER_RUNNING"
-            data = f"SERVER_RUNNING"
+            data = f"200 OK|SERVER_RUNNING"
             data = data.encode()
         if "LOGOUT" in data.decode():
             print('s: Received LOGOUT command from', addr)
