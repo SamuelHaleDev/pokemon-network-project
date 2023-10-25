@@ -53,8 +53,14 @@ def main():
                 print("c: SERVER SHUT DOWN")
                 #   - Send message to server to shut down
                 request_queue.put("SHUTDOWN\n")
-                data = s.recv(MAX_LINE)
-                print("c:", data.decode().strip())
+                response = response_queue.get()
+                if "200" in response:
+                    QUIT = True
+                    request_thread.join()
+                    response_thread.join()
+                    s.close()
+                    print("c: Connection closed.")
+                    break
             if user_input == "11":
                 print("c: CLIENT SHUT DOWN")
                 #  - Check if server is running

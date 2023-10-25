@@ -10,6 +10,8 @@ MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
 connected_clients = 0
 connection_pool = queue.Queue(maxsize=MAX_PENDING)
+SHUTDOWN = False
+exit_event = threading.Event()
 
 clients_lock = threading.Lock()
 
@@ -19,11 +21,17 @@ s.bind(('', PORT)) # Bind the socket to the port
 s.listen(MAX_PENDING) # Listen for connection
 
 def main():
-    with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
-        while True:
+    while not SHUTDOWN:
+        with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
             conn, addr = s.accept() # Accept a connection
             
-            executor.submit(handle_client_route, conn, addr)
+            executor.submit(handle_client_route, conn, addr, exit_event)
+            if exit_event.is_set():
+                break
+    executor.shutdown(wait=True)
+    s.close()
+        
+    
             
 def create_connection():
     return sqlite3.connect("Pokemon.db")
@@ -35,18 +43,27 @@ def get_connection():
             connection_pool.put(create_connection())
         return connection_pool.get()
 
-def handle_client_route(conn, addr):
-    global connected_clients, MAX_LINE, s
+def handle_client_route(conn, addr, exit_event):
+    global connected_clients, MAX_LINE, s, SHUTDOWN
     con = get_connection()
     cur = con.cursor()
     with clients_lock:
         connected_clients += 1
         print(f"s: New connection from {addr}. {connected_clients} connected clients.")
     from smodules.Client import handle_client
-    handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients)
+    finished = handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients)
     
-    with clients_lock:
-        connected_clients -= 1
-        print(f"s: Connection from {addr} closed. {connected_clients} connected clients.")
+    if finished:
+        with clients_lock:
+            connected_clients -= 1
+            print(f"s: Connection from {addr} closed. {connected_clients} connected clients.")
+            SHUTDOWN = True
+        cur.close()
+        con.close()
+        conn.close()
+        exit_event.set()
+        return
+            
+        
 
 main()

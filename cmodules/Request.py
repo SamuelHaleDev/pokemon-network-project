@@ -4,4 +4,6 @@ def handle_request(s, request_queue):
         s.sendall(request.encode())
         if "QUIT" in request:
             break
+        if "SHUTDOWN" in request:
+            break
         

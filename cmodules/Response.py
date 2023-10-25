@@ -9,6 +9,9 @@ def handle_response(s, MAX_LINE, response_queue):
                 if "QUIT" in return_data:
                     response_queue.put("200")
                     break
+                if "SHUTDOWN" in return_data:
+                    response_queue.put("200")
+                    break
             else :
                 return_data = response
             response_queue.put(return_data)

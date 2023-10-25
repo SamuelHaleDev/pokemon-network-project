@@ -39,11 +39,8 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients):
 
         if data.decode().strip() == "SHUTDOWN":
             print('s: Received:', data.decode().strip())
-            conn.sendall(b"200 OK\n")
-            conn.close()
-            s.close()
-            con.close() # Close the database connection
-            exit() # Terminate the server
+            conn.sendall(b"200 OK|SHUTDOWN")
+            return True
 
         if "QUIT" in data.decode():
             print('s: Received QUIT command from', addr)
