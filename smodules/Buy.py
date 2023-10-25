@@ -10,7 +10,7 @@ def Buy(cur, addr, con, data):
     
     #  - CHECK IF CARD EXISTS. IF NOT, SEND ERROR MESSAGE
     if len(results) == 0:
-        data = b"s: Error 403: Card does not exist."
+        data = b"s: Error 404: Card does not exist."
     else:
         #  - CHECK IF USER IS BUYING ALL CARDS. IF SO, UPDATE OWNER_ID. 
         if int(client_request[3]) == int(results[0][4]):

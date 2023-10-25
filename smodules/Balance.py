@@ -6,6 +6,7 @@ def Balance(cur, data, addr):
     # - clear cur object
     cur.execute(f"SELECT usd_balance FROM Users WHERE ID = {owner_id}")
     balance = cur.fetchall()
-    return str(balance)
+    response = f"200 OK|{balance[0][0]}"
+    return response
     
 __all__ = ["Balance"]

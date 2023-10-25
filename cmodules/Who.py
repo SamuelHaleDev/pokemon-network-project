@@ -1,6 +1,6 @@
-def Who(s, MAX_LINE):
+def Who(s, MAX_LINE, request_queue):
     request = f"WHO\n"
-    s.sendall(request.encode())
+    request_queue.put(request)
     response = s.recv(MAX_LINE)
     response = response.decode()
     if "200" in response:

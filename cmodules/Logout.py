@@ -1,8 +1,8 @@
-def Logout(user, s, MAX_LINE):
+def Logout(user, s, MAX_LINE, request_queue):
     user_name = user[3]
     data = f"LOGOUT {user_name}\n"
     
-    s.sendall(data.encode())
+    request_queue.put(data.encode())
     data = s.recv(MAX_LINE)
     response = data.decode()
     

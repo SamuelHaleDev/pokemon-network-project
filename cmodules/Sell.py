@@ -1,4 +1,4 @@
-def SELL(user, s, MAX_LINE):
+def SELL(user, s, MAX_LINE, request_queue):
     pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:")
     while pokemon == "":
         pokemon = input("Please enter a Pokemon to sell: ")
@@ -6,7 +6,7 @@ def SELL(user, s, MAX_LINE):
     userID = user[0]
 
     inventory_request = "INVENTORY " + pokemon + " " + userID
-    s.sendall(inventory_request.encode())
+    request_queue.put(inventory_request)
     data = str(s.recv(MAX_LINE))
     ir, data, data2 = data.split("'")
     count = ""
@@ -19,7 +19,7 @@ def SELL(user, s, MAX_LINE):
         pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:") 
         #pokemon = "QUERYSELL " + pokemon + " " + userID
         inventory_request = "INVENTORY " + pokemon + " " + userID
-        s.sendall(inventory_request.encode())
+        request_queue.put(inventory_request)
         data = str(s.recv(MAX_LINE))
         ir, data, data2 = data.split("'")
 
@@ -53,7 +53,7 @@ def SELL(user, s, MAX_LINE):
 
 
     sell_request = "SELL " + data + " " + quantity + " " + price + " " + userID
-    s.sendall(sell_request.encode())    
+    request_queue.put(sell_request)   
     #print(f"SELL {pokemon} {quantity} {price} {ID}")
 
     data = s.recv(MAX_LINE)

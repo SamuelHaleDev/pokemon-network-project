@@ -1,4 +1,4 @@
-def Deposit(user, s, MAX_LINE):
+def Deposit(user, s, MAX_LINE, request_queue):
     dep_amount = -1
     while dep_amount < 0:
         try:
@@ -6,7 +6,7 @@ def Deposit(user, s, MAX_LINE):
         except ValueError:
             print("Invalid amount.")
     request = f"DEPOSIT {dep_amount} {user[3]}\n"
-    s.sendall(request.encode())
+    request_queue.put(request)
     response = s.recv(MAX_LINE)
     response = response.decode()
     if "200" in response:

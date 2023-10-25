@@ -1,8 +1,8 @@
-def Balance(user, s, MAX_LINE):
+def Balance(user, s, MAX_LINE, request_queue):
     #User Checks their balance
     userID = user[0]
     money = "BALANCE " + userID
-    s.sendall(money.encode())
+    request_queue.put(money)
     money = str(s.recv(MAX_LINE))
     money = money.split("'")[1]
     balance = ""

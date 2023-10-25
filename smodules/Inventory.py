@@ -7,7 +7,7 @@ def Inventory(cur, data, addr):
     pokemon = cur.execute(f"SELECT card_name, count FROM Pokemon_cards WHERE owner_id = {userID} AND card_name = '{card_name}'").fetchall()
     # - GRAB A CARD AT A SPECIFIC USER 
     if (pokemon == []):
-        data = b"NOTFOUND"
+        data = b"404 NOT FOUND"
     else:
         data = str(pokemon)
     return data
