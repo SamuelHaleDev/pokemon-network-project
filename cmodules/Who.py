@@ -1,13 +1,10 @@
 def Who(s, MAX_LINE, request_queue, response_queue):
     request = f"WHO\n"
     request_queue.put(request)
-    response = s.recv(MAX_LINE)
-    response = response.decode()
-    if "200" in response:
-        # split the request after '|' character
-        response = response.split('|')
-        print(f"The list of active users: {response[1]}")
-    else:
+    response = response_queue.get()
+    if "400" in response or "401" in response or "404" in response:
         print("c: WHO failed.")
-    
+    else:
+        print(f"The list of active users: {response}")
+        
 __all__ = ["Who"]
