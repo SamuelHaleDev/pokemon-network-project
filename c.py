@@ -43,7 +43,7 @@ def main():
                 user_input = input("c: Invalid input. Please enter a number between 1 and 6.")
             if user_input == "10" and user != [] and user[3] != "Root":
                 print("c: You do not have permission to shut down the server.")
-            if user_input != "11" and user == []:
+            if ((user_input != "11" and user_input != "7") and user == []):
                 print("c: Please login first.")
             if user_input == "1" and user != []:
                 buy_route(user, request_queue, response_queue)

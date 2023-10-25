@@ -8,8 +8,7 @@ def Login(s, MAX_LINE, request_queue, response_queue):
     # Parse data to separate user data from login response
     response = response_queue.get()
     # Check if login was successful by checking if 200 is in data
-    if "400" in response or "401" in response or "404" in response:  
-        print("c: Login failed.")
+    if "400" in response or "401" in response or "403" in response or "404" in response:  
         log = Login(s, MAX_LINE, request_queue, response_queue)
         return log
     else:
@@ -18,8 +17,6 @@ def Login(s, MAX_LINE, request_queue, response_queue):
         # Turn user_data into a list
         user_data = user_data.replace("b", "").replace("\\", "").replace("(", "").replace(")", "").replace("'", "").replace('"', "")
         user_data = user_data.split(", ")
-        # Return user_data
-        print(user_data)
         return user_data
     
 __all__ = ["Login"]

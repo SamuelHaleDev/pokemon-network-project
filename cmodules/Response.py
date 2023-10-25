@@ -21,6 +21,9 @@ def handle_response(s, MAX_LINE, response_queue):
         elif "401" in response:
             print("c: Wrong username or password.")
             response_queue.put(response)
+        elif "403" in response:
+            print("c: Incorrect username or password")
+            response_queue.put(response)
         elif "404" in response:
             print("c: Your search did not match any records.")
             response_queue.put(response)
