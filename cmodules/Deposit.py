@@ -7,8 +7,7 @@ def Deposit(user, s, MAX_LINE, request_queue, response_queue):
             print("Invalid amount.")
     request = f"DEPOSIT {dep_amount} {user[3]}\n"
     request_queue.put(request)
-    response = s.recv(MAX_LINE)
-    response = response.decode()
+    response = response_queue.get()
     if "200" in response:
         print("Deposit successful.")
     else:

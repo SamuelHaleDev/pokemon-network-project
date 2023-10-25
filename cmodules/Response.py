@@ -4,7 +4,10 @@ def handle_response(s, MAX_LINE, response_queue):
         response = data.decode().strip()
         
         if "200" in response:
-            return_data = data.decode().split("|")[1].strip()
+            if "|" in response:
+                return_data = data.decode().split("|")[1].strip()
+            else :
+                return_data = response
             response_queue.put(return_data)
         elif "400" in response:
             print("c: Error depositing funds.")
