@@ -100,6 +100,11 @@ def main():
                 user_input = ""
         except Exception as e:
             print(f"c: An error occurred: {e}")
+            request_queue.pyt("QUIT\n")
+            request_thread.join()
+            response_thread.join()
+            s.close()
+            print("c: Connection closed.")
             print("c: Client failed.")
             break
 
