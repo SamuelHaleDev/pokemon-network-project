@@ -36,67 +36,72 @@ def main():
     response_thread = threading.Thread(target=handle_response, args=(s, MAX_LINE, response_queue))  
     response_thread.start()
     while not QUIT:
-        user = []
-        while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11":
-            user_input = menu()
-            while (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11"):
-                user_input = input("c: Invalid input. Please enter a number between 1 and 6.")
-            if user_input == "10" and user != [] and user[3] != "Root":
-                print("c: You do not have permission to shut down the server.")
-            if ((user_input != "11" and user_input != "7") and user == []):
-                print("c: Please login first.")
-            if user_input == "1" and user != []:
-                buy_route(user, request_queue, response_queue)
-            if user_input == "2" and user != []:
-                sell_route(user, request_queue, response_queue)
-            if user_input == "3" and user != []:
-                list_route(user, request_queue, response_queue)
-            if user_input == "4" and user != []:
-                balance_route(user, request_queue, response_queue)
-            if user_input == "10" and user != [] and user[3] == "Root":
-                print("c: SERVER SHUT DOWN")
-                #   - Send message to server to shut down
-                request_queue.put("SHUTDOWN\n")
-                response = response_queue.get()
-                if "200" in response:
-                    QUIT = True
-                    request_thread.join()
-                    response_thread.join()
-                    s.close()
-                    print("c: Connection closed.")
-                    break
-            if user_input == "11":
-                print("c: CLIENT SHUT DOWN")
-                #  - Check if server is running
-                if check_server_status(request_queue, response_queue):
-                    try:
-                        #   - Send QUIT message to server
-                        request_queue.put("QUIT\n")
-                        #   - Wait for confirmation message from server
-                        data = response_queue.get()
-                        if "200" in data:
-                            QUIT = True
-                            request_thread.join()
-                            response_thread.join()
-                            s.close()
-                            print("c: Connection closed.")
-                            break
-                        else:
-                            print("c: Error closing connection.")
-                    except ConnectionAbortedError:
-                        pass
-            if user_input == "7":
-                while user == []:
-                    user = login_route(request_queue, response_queue)
-            if user_input == "8" and user != []:
-                user = logout_route(user, request_queue, response_queue)
-            if user_input == "5" and user != [] and user[3] == "Root":
-                who_route(request_queue, response_queue)
-            if user_input == "6" and user != []:
-                lookup_route(request_queue, response_queue)
-            if user_input == "9" and user != []:
-                deposit_route(user, request_queue, response_queue)
-            user_input = ""
+        try:
+            user = []
+            while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11":
+                user_input = menu()
+                while (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11"):
+                    user_input = input("c: Invalid input. Please enter a number between 1 and 6.")
+                if user_input == "10" and user != [] and user[3] != "Root":
+                    print("c: You do not have permission to shut down the server.")
+                if ((user_input != "11" and user_input != "7") and user == []):
+                    print("c: Please login first.")
+                if user_input == "1" and user != []:
+                    buy_route(user, request_queue, response_queue)
+                if user_input == "2" and user != []:
+                    sell_route(user, request_queue, response_queue)
+                if user_input == "3" and user != []:
+                    list_route(user, request_queue, response_queue)
+                if user_input == "4" and user != []:
+                    balance_route(user, request_queue, response_queue)
+                if user_input == "10" and user != [] and user[3] == "Root":
+                    print("c: SERVER SHUT DOWN")
+                    #   - Send message to server to shut down
+                    request_queue.put("SHUTDOWN\n")
+                    response = response_queue.get()
+                    if "200" in response:
+                        QUIT = True
+                        request_thread.join()
+                        response_thread.join()
+                        s.close()
+                        print("c: Connection closed.")
+                        break
+                if user_input == "11":
+                    print("c: CLIENT SHUT DOWN")
+                    #  - Check if server is running
+                    if check_server_status(request_queue, response_queue):
+                        try:
+                            #   - Send QUIT message to server
+                            request_queue.put("QUIT\n")
+                            #   - Wait for confirmation message from server
+                            data = response_queue.get()
+                            if "200" in data:
+                                QUIT = True
+                                request_thread.join()
+                                response_thread.join()
+                                s.close()
+                                print("c: Connection closed.")
+                                break
+                            else:
+                                print("c: Error closing connection.")
+                        except ConnectionAbortedError:
+                            pass
+                if user_input == "7":
+                    while user == []:
+                        user = login_route(request_queue, response_queue)
+                if user_input == "8" and user != []:
+                    user = logout_route(user, request_queue, response_queue)
+                if user_input == "5" and user != [] and user[3] == "Root":
+                    who_route(request_queue, response_queue)
+                if user_input == "6" and user != []:
+                    lookup_route(request_queue, response_queue)
+                if user_input == "9" and user != []:
+                    deposit_route(user, request_queue, response_queue)
+                user_input = ""
+        except Exception as e:
+            print(f"c: An error occurred: {e}")
+            print("c: Client failed.")
+            break
 
 def buy_route(user, request_queue, response_queue):
     global s, MAX_LINE
