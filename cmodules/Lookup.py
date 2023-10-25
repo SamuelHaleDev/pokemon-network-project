@@ -1,4 +1,4 @@
-def Lookup(s, MAX_LINE, request_queue):
+def Lookup(s, MAX_LINE, request_queue, response_queue):
     pokemon = input("Search for pokemon on name: ")
     request = f"LOOKUP {pokemon}\n"
     request_queue.put(request)

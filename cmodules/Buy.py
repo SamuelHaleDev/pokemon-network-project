@@ -1,4 +1,4 @@
-def Buy(user, s, MAX_LINE, request_queue):
+def Buy(user, s, MAX_LINE, request_queue, response_queue):
     #  - GET CARD DATA
     user_input = input("c: Enter card name: ")
     user_input = "QUERY " + user_input

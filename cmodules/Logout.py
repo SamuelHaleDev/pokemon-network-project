@@ -1,4 +1,4 @@
-def Logout(user, s, MAX_LINE, request_queue):
+def Logout(user, s, MAX_LINE, request_queue, response_queue):
     user_name = user[3]
     data = f"LOGOUT {user_name}\n"
     

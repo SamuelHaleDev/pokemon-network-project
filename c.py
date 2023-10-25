@@ -3,6 +3,7 @@ import queue
 import threading
 from typing import List
 from cmodules.Request import handle_request
+from cmodules.Response import handle_response
 
 # Define server address and port
 import argparse
@@ -28,10 +29,13 @@ s.connect((SERVER_HOST, SERVER_PORT)) # Connect to server address
 
 def main():
     request_queue = queue.Queue()
+    response_queue = queue.Queue()
     QUIT = False
     user_input = ""
     request_thread = threading.Thread(target=handle_request, args=(s, request_queue))
     request_thread.start()
+    response_thread = threading.Thread(target=handle_response, args=(s, MAX_LINE, response_queue))  
+    response_thread.start()
     while not QUIT:
         user = []
         while user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6":
@@ -39,13 +43,13 @@ def main():
             if (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10"):
                 print("c: Invalid input. Please enter a number between 1 and 6.")
             if user_input == "1" and user != []:
-                buy_route(user, request_queue)
+                buy_route(user, request_queue, response_queue)
             if user_input == "2" and user != []:
-                sell_route(user, request_queue)
+                sell_route(user, request_queue, response_queue)
             if user_input == "3" and user != []:
-                list_route(user, request_queue)
+                list_route(user, request_queue, response_queue)
             if user_input == "4" and user != []:
-                balance_route(user, request_queue)
+                balance_route(user, request_queue, response_queue)
             if user_input == "10" and user != [] and user[3] == "Root":
                 print("c: SERVER SHUT DOWN")
                 #   - Send message to server to shut down
@@ -68,67 +72,67 @@ def main():
                         pass
                 QUIT = True
             if user_input == "7":
-                user = login_route(request_queue)
+                user = login_route(request_queue, response_queue)
             if user_input == "8" and user != []:
-                user = logout_route(user, request_queue)
+                user = logout_route(user, request_queue, response_queue)
             if user_input == "5" and user[3] == "Root":
-                who_route(request_queue)
+                who_route(request_queue, response_queue)
             if user_input == "6" and user != []:
-                lookup_route(request_queue)
+                lookup_route(request_queue, response_queue)
             if user_input == "9" and user != []:
-                deposit_route(user, request_queue)
+                deposit_route(user, request_queue, response_queue)
             user_input = ""
 
-def buy_route(user, request_queue):
+def buy_route(user, request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Buy import Buy
-    Buy(user, s, MAX_LINE, request_queue)
+    Buy(user, s, MAX_LINE, request_queue, response_queue)
     
-def sell_route(user, request_queue):
+def sell_route(user, request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Sell import SELL
-    SELL(user, s, MAX_LINE, request_queue)
+    SELL(user, s, MAX_LINE, request_queue, response_queue)
     
-def login_route(request_queue):
+def login_route(request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Login import Login
-    return Login(s, MAX_LINE, request_queue)
+    return Login(s, MAX_LINE, request_queue, response_queue)
 
-def balance_route(user, request_queue):
+def balance_route(user, request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Balance import Balance 
-    Balance(user, s, MAX_LINE, request_queue)
+    Balance(user, s, MAX_LINE, request_queue, response_queue)
     
-def list_route(user, request_queue):
+def list_route(user, request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.List import List
-    List(user, s, MAX_LINE, request_queue)  
+    List(user, s, MAX_LINE, request_queue, response_queue)  
     
-def logout_route(user, request_queue):
+def logout_route(user, request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Logout import Logout
-    return Logout(user, s, MAX_LINE, request_queue)
+    return Logout(user, s, MAX_LINE, request_queue, response_queue)
 
-def who_route(request_queue):
+def who_route(request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Who import Who
-    Who(s, MAX_LINE, request_queue)
+    Who(s, MAX_LINE, request_queue, response_queue)
     
-def lookup_route(request_queue):
+def lookup_route(request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Lookup import Lookup
-    Lookup(s, MAX_LINE, request_queue)
+    Lookup(s, MAX_LINE, request_queue, response_queue)
     
-def deposit_route(user, request_queue):
+def deposit_route(user, request_queue, response_queue):
     global s, MAX_LINE
     from cmodules.Deposit import Deposit
-    Deposit(user, s, MAX_LINE, request_queue)
+    Deposit(user, s, MAX_LINE, request_queue, response_queue)
 
-def check_server_status(request_queue):
+def check_server_status(request_queue, response_queue):
     # Send a message to the server to check if it's still running
     request_queue.put(b"STATUS\n")
-    data = s.recv(MAX_LINE)
-    if data.decode().strip() == "SERVER_RUNNING":
+    data = response_queue.get()
+    if "SERVER_RUNNING" in data:
         return True
     else:
         return False

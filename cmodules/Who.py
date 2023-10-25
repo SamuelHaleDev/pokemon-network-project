@@ -1,4 +1,4 @@
-def Who(s, MAX_LINE, request_queue):
+def Who(s, MAX_LINE, request_queue, response_queue):
     request = f"WHO\n"
     request_queue.put(request)
     response = s.recv(MAX_LINE)

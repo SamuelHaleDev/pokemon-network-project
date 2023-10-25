@@ -1,4 +1,4 @@
-def SELL(user, s, MAX_LINE, request_queue):
+def SELL(user, s, MAX_LINE, request_queue, response_queue):
     pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:")
     while pokemon == "":
         pokemon = input("Please enter a Pokemon to sell: ")

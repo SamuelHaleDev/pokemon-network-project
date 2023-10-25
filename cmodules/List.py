@@ -1,4 +1,4 @@
-def List(user, s, MAX_LINE, request_queue):
+def List(user, s, MAX_LINE, request_queue, response_queue):
     #  - BUILD CLIENT REQUEST
     print("c: LISTING ALL RECORDS IN POKEMON CARDS TABLE")
     client_request = "LIST"

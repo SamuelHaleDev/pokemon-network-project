@@ -1,4 +1,4 @@
-def Deposit(user, s, MAX_LINE, request_queue):
+def Deposit(user, s, MAX_LINE, request_queue, response_queue):
     dep_amount = -1
     while dep_amount < 0:
         try:
