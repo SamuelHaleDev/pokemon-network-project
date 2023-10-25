@@ -1,11 +1,11 @@
 def handle_response(s, MAX_LINE, response_queue):
     while True:
         data = s.recv(MAX_LINE)
-        response = data.decode().split("|")[0].strip()
-        data = data.decode().split("|")[1].strip()
+        response = data.decode().strip()
         
         if "200" in response:
-            response_queue.put(data)
+            return_data = data.decode().split("|")[1].strip()
+            response_queue.put(return_data)
         elif "400" in response:
             print("c: Error depositing funds.")
             response_queue.put(response)

@@ -1,14 +1,16 @@
+import ast
+
 def Buy(user, s, MAX_LINE, request_queue, response_queue):
     #  - GET CARD DATA
     user_input = input("c: Enter card name: ")
-    user_input = "QUERY " + user_input
+    user_input = "LOOKUP " + user_input
     request_queue.put(user_input)
-    data = s.recv(MAX_LINE)
-    if b"Error" in data:
+    data = response_queue.get()
+    if "400" in data or "401" in data or "404" in data:
         print(data.decode())
         print("c: Card {}".format(user_input.split(" ")[1]))
         return
-    pokemon = data.decode().replace("(", "").replace(")", "").replace("'", "").split(", ")
+    pokemon = ast.literal_eval(data)[0]
     
     #  - PROMPT USER FOR DESIRED QUANTITY 
     quantity = input("c: Enter quantity: ")
@@ -32,14 +34,13 @@ def Buy(user, s, MAX_LINE, request_queue, response_queue):
     #  - SEND REQUEST TO SERVER
     client_request = "BUY {} {} {} {} {} {}".format(pokemon[1], pokemon[2], price, quantity, pokemon[5], user[0])
     request_queue.put(client_request)
-    data = s.recv(MAX_LINE)
+    data = response_queue.get()
     
     #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
-    if b"200" in data:
-        balance = data.split(b"|")[1]
-        print("c: Bought: {} {} New Balance: {}".format(quantity, pokemon[1], float(balance)))
+    if "400" in data or "401" in data or "404" in data:
+        print("c: Transaction failed. Server Message: {}".format(data))
     else:
-        #  - ELSE TRANSACTION FAILED
-        print("c: Transaction failed. Server Message: {}".format(data.decode()))
+        balance = data
+        print("c: Bought: {} {} New Balance: {}".format(quantity, pokemon[1], float(balance)))
         
 __all__ = ["Buy"]

@@ -10,10 +10,6 @@ def inventory_route(data, addr, cur):
     from smodules.Inventory import Inventory
     return Inventory(cur, data, addr)
 
-def query_route(data, addr, cur):
-    from smodules.Query import Query
-    return Query(cur, data, addr)
-
 def login_route(data, addr, cur):
     from smodules.Login import Login
     return Login(cur, data, addr)
@@ -53,10 +49,6 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur):
             print('s: Received QUIT command from', addr)
             #   - Send confirmation message back to client
             data = b"200 OK"
-
-        if "QUERY" in data.decode():
-            data = query_route(data, addr, cur)
-            data = data.encode()
         if "LOGIN" in data.decode():
             data = login_route(data, addr, cur)
             data = data.encode()
