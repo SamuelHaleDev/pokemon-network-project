@@ -23,15 +23,21 @@ s.listen(MAX_PENDING) # Listen for connection
 
 def main():
     global connected_clients
-    while not SHUTDOWN:
-        with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
-            conn, addr = s.accept() # Accept a connection
-            
-            executor.submit(handle_client_route, conn, addr, exit_event, connected_clients)
-            if exit_event.is_set():
-                break
-    executor.shutdown(wait=True)
-    s.close()
+    try:
+        while not SHUTDOWN:
+            with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
+                conn, addr = s.accept() # Accept a connection
+                
+                executor.submit(handle_client_route, conn, addr, exit_event, connected_clients)
+                if exit_event.is_set():
+                    break
+        executor.shutdown(wait=True)
+        s.close()
+    except Exception as e:
+        print(f"s: An error occurred: {e}")
+        print("s: Server shutting down.")
+        executor.shutdown(wait=True)
+        s.close()
         
     
             
