@@ -86,7 +86,8 @@ def main():
                     except ConnectionAbortedError:
                         pass
             if user_input == "7":
-                user = login_route(request_queue, response_queue)
+                while user == []:
+                    user = login_route(request_queue, response_queue)
             if user_input == "8" and user != []:
                 user = logout_route(user, request_queue, response_queue)
             if user_input == "5" and user != [] and user[3] == "Root":
