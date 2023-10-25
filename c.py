@@ -75,12 +75,16 @@ def main():
                 user = login_route(request_queue, response_queue)
             if user_input == "8" and user != []:
                 user = logout_route(user, request_queue, response_queue)
-            if user_input == "5" and user[3] == "Root":
+            if user_input == "5" and user != [] and user[3] == "Root":
                 who_route(request_queue, response_queue)
             if user_input == "6" and user != []:
                 lookup_route(request_queue, response_queue)
             if user_input == "9" and user != []:
                 deposit_route(user, request_queue, response_queue)
+            if user_input == "10" and user != [] and user[3] != "Root":
+                print("c: You do not have permission to shut down the server.")
+            if user_input != "11" and user == []:
+                print("c: Please login first.")
             user_input = ""
 
 def buy_route(user, request_queue, response_queue):
