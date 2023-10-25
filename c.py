@@ -41,6 +41,10 @@ def main():
             user_input = menu()
             while (user_input != "1" and user_input != "2" and user_input != "3" and user_input != "4" and user_input != "5" and user_input != "6" and user_input != "7" and user_input != "8" and user_input != "9" and user_input != "10" and user_input != "11"):
                 user_input = input("c: Invalid input. Please enter a number between 1 and 6.")
+            if user_input == "10" and user != [] and user[3] != "Root":
+                print("c: You do not have permission to shut down the server.")
+            if user_input != "11" and user == []:
+                print("c: Please login first.")
             if user_input == "1" and user != []:
                 buy_route(user, request_queue, response_queue)
             if user_input == "2" and user != []:
@@ -91,10 +95,6 @@ def main():
                 lookup_route(request_queue, response_queue)
             if user_input == "9" and user != []:
                 deposit_route(user, request_queue, response_queue)
-            if user_input == "10" and user != [] and user[3] != "Root":
-                print("c: You do not have permission to shut down the server.")
-            if user_input != "11" and user == []:
-                print("c: Please login first.")
             user_input = ""
 
 def buy_route(user, request_queue, response_queue):

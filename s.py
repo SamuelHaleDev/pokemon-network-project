@@ -8,10 +8,11 @@ import queue
 PORT = 4988 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
-connected_clients = 0
+connected_clients = []
 connection_pool = queue.Queue(maxsize=MAX_PENDING)
 SHUTDOWN = False
 exit_event = threading.Event()
+
 
 clients_lock = threading.Lock()
 
@@ -21,11 +22,12 @@ s.bind(('', PORT)) # Bind the socket to the port
 s.listen(MAX_PENDING) # Listen for connection
 
 def main():
+    global connected_clients
     while not SHUTDOWN:
         with ThreadPoolExecutor(max_workers=MAX_PENDING) as executor:
             conn, addr = s.accept() # Accept a connection
             
-            executor.submit(handle_client_route, conn, addr, exit_event)
+            executor.submit(handle_client_route, conn, addr, exit_event, connected_clients)
             if exit_event.is_set():
                 break
     executor.shutdown(wait=True)
@@ -43,20 +45,22 @@ def get_connection():
             connection_pool.put(create_connection())
         return connection_pool.get()
 
-def handle_client_route(conn, addr, exit_event):
-    global connected_clients, MAX_LINE, s, SHUTDOWN
+def handle_client_route(conn, addr, exit_event, connected_clients):
+    global MAX_LINE, s, SHUTDOWN
     con = get_connection()
     cur = con.cursor()
     with clients_lock:
-        connected_clients += 1
-        print(f"s: New connection from {addr}. {connected_clients} connected clients.")
+        connected_clients.append(["anonymous", addr])
+        print(f"s: New connection from {addr}. {len(connected_clients)} connected clients.")
     from smodules.Client import handle_client
     finished = handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients)
     
     if finished:
         with clients_lock:
-            connected_clients -= 1
-            print(f"s: Connection from {addr} closed. {connected_clients} connected clients.")
+            for client in connected_clients:
+                if client[1] == addr:
+                    connected_clients.remove(client)
+            print(f"s: Connection from {addr} closed. {len(connected_clients)} connected clients.")
             SHUTDOWN = True
         cur.close()
         con.close()

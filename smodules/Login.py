@@ -1,4 +1,4 @@
-def Login(cur, data, addr):
+def Login(cur, data, addr, connected_clients):
     print('s: Received', repr(data), 'from', addr)
     #  - GET USERNAME AND PASSWORD
     username = data.decode().split(" ")[1]
@@ -12,6 +12,10 @@ def Login(cur, data, addr):
         filler_list = [0,1]
         data = f"{server_response}{filler_list}"
     else:
+        #  - ADD USER TO CONNECTED CLIENTS
+        for client in connected_clients:
+            if client[1] == addr:
+                client[0] = username
         #  - SEND USER DATA
         server_response = b"s: 200: OK|"
         user_data = str(results[0]).encode()

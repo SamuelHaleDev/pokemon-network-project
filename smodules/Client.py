@@ -10,9 +10,9 @@ def inventory_route(data, addr, cur):
     from smodules.Inventory import Inventory
     return Inventory(cur, data, addr)
 
-def login_route(data, addr, cur):
+def login_route(data, addr, cur, connected_clients):
     from smodules.Login import Login
-    return Login(cur, data, addr)
+    return Login(cur, data, addr, connected_clients)
 
 def list_route(data, addr, cur):
     from smodules.List import List
@@ -44,11 +44,9 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients):
 
         if "QUIT" in data.decode():
             print('s: Received QUIT command from', addr)
-            print('s: Client from {} disconnected.'.format(addr))
-            connected_clients -= 1
             data = b"200 OK|QUIT"
         if "LOGIN" in data.decode():
-            data = login_route(data, addr, cur)
+            data = login_route(data, addr, cur, connected_clients)
             data = data.encode()
         if "BALANCE" in data.decode():
             data = balance_route(data, addr, cur)
@@ -71,10 +69,13 @@ def handle_client(conn, addr, MAX_LINE, s, con, cur, connected_clients):
             data = data.encode()
         if "LOGOUT" in data.decode():
             print('s: Received LOGOUT command from', addr)
+            for client in connected_clients:
+                if client[1] == addr:
+                    client[0] = "anonymous"
             data = f"200 OK"
             data = data.encode()
         if "WHO" in data.decode():
-            data = f"200 OK"
+            data = f"200 OK|{connected_clients}"
             data = data.encode()
         if "LOOKUP" in data.decode():
             data = lookup_route(data, addr, cur, con)
