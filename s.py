@@ -5,7 +5,7 @@ import threading
 import queue
 
 # Define server port
-PORT = 4987 # Port number is a 16-bit unsigned integer
+PORT = 4988 # Port number is a 16-bit unsigned integer
 MAX_PENDING = 5 # Maximum number of pending connections
 MAX_LINE = 256 # Maximum number of bytes to receive
 connected_clients = 0

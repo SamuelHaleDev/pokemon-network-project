@@ -9,7 +9,7 @@ def Inventory(cur, data, addr):
     if (pokemon == []):
         data = b"404 NOT FOUND"
     else:
-        data = str(pokemon)
+        data = f"200 OK|{pokemon[0][0]} {pokemon[0][1]}"
     return data
         
 __all__ = ["Inventory"]

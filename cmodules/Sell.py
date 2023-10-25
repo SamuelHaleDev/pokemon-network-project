@@ -7,14 +7,14 @@ def SELL(user, s, MAX_LINE, request_queue, response_queue):
 
     inventory_request = "INVENTORY " + pokemon + " " + userID
     request_queue.put(inventory_request)
-    data = str(s.recv(MAX_LINE))
-    ir, data, data2 = data.split("'")
+    data = response_queue.get()
+    data, data2 = data.split(" ")
     count = ""
 
     #quantity = data.split("'")
     #print(data)
     #print(count)
-    while (data == "NOTFOUND") and not (pokemon == "CANCEL"):
+    while "404" in data and not (pokemon == "CANCEL"):
         print("Pokemon Not Found")
         pokemon = input("Please enter the Pokemon you want to sell or type CANCEL to exit:") 
         #pokemon = "QUERYSELL " + pokemon + " " + userID
@@ -56,14 +56,13 @@ def SELL(user, s, MAX_LINE, request_queue, response_queue):
     request_queue.put(sell_request)   
     #print(f"SELL {pokemon} {quantity} {price} {ID}")
 
-    data = s.recv(MAX_LINE)
+    data = response_queue.get()
     
-    #  - IF 200 IS IN DATA, TRANSACTION SUCCESSFUL
-    if b"200" in data:
-        balance = data.split(b"|")[1]
-        print("c: Sold: {} {} New Balance: {}".format(quantity, pokemon, float(balance)))
+    if "400" in data or "401" in data or "404" in data:
+        print("c: Transaction failed. Server Message: {}".format(data))
+        
     else:
-        #  - ELSE TRANSACTION FAILED
-        print("c: Transaction failed. Server Message: {}".format(data.decode()))
+        balance = data
+        print("c: Sold: {} {} New Balance: {}".format(quantity, pokemon, float(balance)))
     
 __all__ = ["SELL"]
