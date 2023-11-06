@@ -11,10 +11,10 @@ Welcome to our CIS 427 project 2. This project is an add-on to project 1 in whic
 
 - Each Student’s role:
   
-1. Sam : 
-2. Edward : 
-3. Thor : 
-4. Andrew : 
+1. Sam: Main Server Dev, Backend Testing
+2. Edward: Client Side functionality dev, Front End Testing
+3. Thor: Minor Client Side Dev, Main testing procedure developer
+4. Andrew: Client Side functionality dev, Full Stack Testing
 
 - Bugs in the code:
 
@@ -26,13 +26,13 @@ Welcome to our CIS 427 project 2. This project is an add-on to project 1 in whic
 
 +---------------------------------------------------------------------------------------------------+
 
-|   Test 1            |   001           |   Expected Result 1  |   Actual Result 1  |   Pass        |
+| Login To Server from Client | 001 | Successful login to server | Successful Loging to server | Pass |
 
-|   Test 2            |   002           |   Expected Result 2  |   Actual Result 2  |   Fail        |
+|  List Proof from Server  |   002   |   Successful listing of records on server  |  Successful listing of records on server  |  Pass  |
 
-|   Test 3            |   003           |   Expected Result 3  |   Actual Result 3  |   Pass        |
+|   List Proof from Client  |   003  |   Successful listing of records from client  |  Successful listing of records from client |   Pass  |
 
-|   Test 4            |   004           |   Expected Result 4  |   Actual Result 4  |   Pass        |
+|   Logout Proof from Server |   004           |   Expected Result 4  |   Actual Result 4  |   Pass        |
 
 |   Test 5            |   005           |   Expected Result 5  |   Actual Result 5  |   Fail        |
 
