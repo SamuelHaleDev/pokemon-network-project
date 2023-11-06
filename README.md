@@ -42,6 +42,5 @@ Welcome to our CIS 427 project 2. This project is an add-on to project 1 in whic
 
 +---------------------------------------------------------------------------------------------------+
 
-
 - Screenshots:
   This can be found in the Project 2 testing document
