@@ -4,7 +4,10 @@ Welcome to our CIS 427 project 2. This project is an add-on to project 1 in whic
 - Running Instructions:
 
 1. Download a copy of the project and open it to Visual Studio Code
-2. 
+2. Make sure you are in the project folder to run the file
+3. You must start the server before running the client
+4. Run 'python s.py' to start the server
+5. Run 'python c.py' to start the client
 
 - Each Student’s role:
   
